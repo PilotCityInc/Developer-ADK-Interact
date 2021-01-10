@@ -3,17 +3,11 @@ networks:
   pdk:
     driver: bridge
 services:
-<<<<<<< HEAD
   interact: #in container-based development
     container_name: interact
     build: 
       context: .
       dockerfile: client.dockerfile 
-=======
-  microapp: #in container-based development
-    image: pilotcity/boiler
-    container_name: microapp
->>>>>>> upstream/master
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
