@@ -189,6 +189,27 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-timeline dense>
+                <v-timeline-item fill-dot class="white--text mb-6" color="#f79961">
+                  <template v-slot:icon>
+                    <v-avatar size="34"
+                      ><img
+                        src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
+                    /></v-avatar>
+                  </template>
+                  <v-text-field
+                    v-model="input"
+                    class="module-default__answer-text"
+                    hide-details
+                    flat
+                    placeholder="Answer or comment . . . "
+                    solo
+                    @keydown.enter="comment"
+                  >
+                    <template v-slot:append>
+                      <v-btn small class="mx-0" outlined depressed @click="comment">Post</v-btn>
+                    </template>
+                  </v-text-field>
+                </v-timeline-item>
                 <v-slide-x-transition group>
                   <v-timeline-item
                     v-for="event in timeline"
@@ -265,6 +286,27 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-timeline dense>
+                <v-timeline-item fill-dot class="white--text mb-6" color="#f79961">
+                  <template v-slot:icon>
+                    <v-avatar size="34"
+                      ><img
+                        src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
+                    /></v-avatar>
+                  </template>
+                  <v-text-field
+                    v-model="input"
+                    class="module-default__answer-text"
+                    hide-details
+                    flat
+                    placeholder="Answer or comment . . . "
+                    solo
+                    @keydown.enter="comment"
+                  >
+                    <template v-slot:append>
+                      <v-btn small class="mx-0" outlined depressed @click="comment">Post</v-btn>
+                    </template>
+                  </v-text-field>
+                </v-timeline-item>
                 <v-slide-x-transition group>
                   <v-timeline-item
                     v-for="event in timeline"
