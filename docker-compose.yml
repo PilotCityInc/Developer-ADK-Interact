@@ -5,9 +5,7 @@ networks:
 services:
   interact: #in container-based development
     container_name: interact
-    build: 
-      context: .
-      dockerfile: client.dockerfile 
+    build: .
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
