@@ -45,319 +45,56 @@
     <div class="module-edit__container">
       <!-- ENTER CONTENT HERE -->
       <div class="module-default__row">
-        <v-text-field rounded class="mr-4" outlined placeholder="You have 2 questions remaining">
+        <v-text-field
+          rounded
+          class="mr-4"
+          v-model="questionInput"
+          outlined
+          placeholder="You have 2 questions remaining"
+        >
         </v-text-field>
-        <v-btn color="#f79961" rounded dark depressed x-large>Ask Question</v-btn>
+        <v-btn color="#f79961" rounded dark depressed x-large @click="postQuestion"
+          >Ask Question</v-btn
+        >
       </div>
       <div class="module-default__row">
-        <v-btn class="mr-1 ml-2" color="#f79961" dark depressed small
-          ><v-icon color="white" left>mdi-account-supervisor-circle-outline</v-icon>All</v-btn
-        >
-        <v-btn class="mr-1 ml-2" color="grey" outlined depressed small
-          ><v-icon color="grey lighten-1" left>mdi-comment-question</v-icon>My Questions</v-btn
-        >
-        <v-btn class="mr-1 ml-2" color="grey" outlined depressed small
-          ><v-icon color="grey lighten-1" left>mdi-bookmark</v-icon>Bookmarks</v-btn
+        <v-btn
+          v-for="option in filterOptions"
+          :key="option.label"
+          class="mr-1 ml-2"
+          :color="filter === option.label ? '#f79961' : 'grey'"
+          :dark="filter === option.label ? true : null"
+          :outlined="filter === option.label ? false : true"
+          depressed
+          small
+          @click="
+            filter = option.label;
+            page = 1;
+          "
+          ><v-icon :color="filter === option.label ? 'white' : 'grey lighten-1'" left>{{
+            `mdi-${option.icon}`
+          }}</v-icon
+          >{{ option.label }}</v-btn
         >
       </div>
       <div>
-        <v-expansion-panels accordion flat class="mb-8">
-          <v-expansion-panel>
-            <v-expansion-panel-header hide-actions disabled>
-              <div class="module-default__question-header">Who will get the internships?</div>
-            </v-expansion-panel-header>
-            <!-- <v-expansion-panel-content></v-expansion-panel-content> -->
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header hide-actions>
-              <div>
-                <v-btn small rounded outlined depressed>23 Replies</v-btn>
+        <div v-if="timeline.length > 0">
+          <Question
+            v-for="question in timeline"
+            :key="question.id"
+            :question="question"
+            @likeQuestion="likeQuestion"
+            @dislikeQuestion="dislikeQuestion"
+            @bookmarkQuestion="bookmarkQuestion"
+            @flagQuestion="flagQuestion"
+            @likeComment="likeComment"
+            @flagComment="flagComment"
+          />
+        </div>
+        <div v-else class="text-center module-default__question-header">No questions yet!</div>
 
-                <v-btn class="ml-2 mr-1" small depressed rounded color="white"
-                  ><v-icon left small color="grey">mdi-thumb-up</v-icon> 96
-                </v-btn>
-                <v-btn class="ml-2 mr-1" small depressed rounded color="white"
-                  ><v-icon left small color="grey">mdi-thumb-down</v-icon> 10
-                </v-btn>
-
-                <v-btn class="ml-3 mr-2" small icon
-                  ><v-icon small color="grey lighten-2">mdi-flag</v-icon>
-                </v-btn>
-                <v-btn class="ml-6 mr-3" small icon
-                  ><v-icon small color="grey lighten-2">mdi-bookmark</v-icon>
-                </v-btn>
-              </div>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-timeline dense>
-                <v-timeline-item fill-dot class="white--text mb-6" color="#f79961">
-                  <template v-slot:icon>
-                    <v-avatar size="34"
-                      ><img
-                        src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
-                    /></v-avatar>
-                  </template>
-                  <v-text-field
-                    v-model="input"
-                    class="module-default__answer-text"
-                    hide-details
-                    flat
-                    placeholder="Answer or comment . . . "
-                    solo
-                    @keydown.enter="comment"
-                  >
-                    <template v-slot:append>
-                      <v-btn small class="mx-0" outlined depressed @click="comment">Post</v-btn>
-                    </template>
-                  </v-text-field>
-                </v-timeline-item>
-                <v-slide-x-transition group>
-                  <v-timeline-item
-                    v-for="event in timeline"
-                    :key="event.id"
-                    class="mb-3"
-                    color="#f79961"
-                    fill-dot
-                    small
-                  >
-                    <template v-slot:icon>
-                      <v-avatar size="20"
-                        ><img
-                          src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
-                      /></v-avatar>
-                    </template>
-                    <v-row justify="space-between">
-                      <v-col
-                        class="module-default__answer-text"
-                        cols="9"
-                        v-text="event.text"
-                      ></v-col>
-                      <!-- <v-col class="text-right" cols="3" v-text="event.time"></v-col> -->
-                      <v-col class="text-right" cols="3">
-                        <!-- POSTER, STUDENT PARTICIPANT OR ORGANIZER CAN DELETE POSTS -->
-                        <!-- <v-btn small class="module__trash" icon
-                          ><v-icon small color="grey" class="module__trash"
-                            >mdi-trash-can-outline</v-icon
-                          ></v-btn
-                        > -->
-
-                        <v-btn class="module__trash" small icon
-                          ><v-icon class="module__trash" small color="grey"
-                            >mdi-heart</v-icon
-                          ></v-btn
-                        >
-                        <!-- ANYONE CAN FLAG COMMENTS -->
-                        <v-btn small class="module__trash" icon
-                          ><v-icon small color="grey lighten-2" class="module__trash"
-                            >mdi-flag</v-icon
-                          ></v-btn
-                        >
-                      </v-col>
-                    </v-row>
-                  </v-timeline-item>
-                </v-slide-x-transition>
-              </v-timeline>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-        <v-expansion-panels accordion flat class="mb-8">
-          <v-expansion-panel>
-            <v-expansion-panel-header hide-actions disabled>
-              <div class="module-default__question-header">
-                Does anyone know how the human-centered design process works?
-              </div>
-            </v-expansion-panel-header>
-            <!-- <v-expansion-panel-content></v-expansion-panel-content> -->
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header hide-actions>
-              <div>
-                <v-btn small rounded outlined depressed>18 Replies</v-btn>
-                <v-btn class="ml-2 mr-1" small depressed rounded color="white"
-                  ><v-icon left small color="grey">mdi-thumb-up</v-icon> 42
-                </v-btn>
-                <v-btn class="ml-1 mr-2" small depressed rounded color="white"
-                  ><v-icon left small color="grey">mdi-thumb-down</v-icon> 5
-                </v-btn>
-                <v-btn class="ml-3 mr-2" small icon
-                  ><v-icon small color="grey lighten-2">mdi-flag</v-icon>
-                </v-btn>
-                <v-btn class="ml-6 mr-3" small icon
-                  ><v-icon small color="grey lighten-2">mdi-bookmark</v-icon>
-                </v-btn>
-              </div>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-timeline dense>
-                <v-timeline-item fill-dot class="white--text mb-6" color="#f79961">
-                  <template v-slot:icon>
-                    <v-avatar size="34"
-                      ><img
-                        src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
-                    /></v-avatar>
-                  </template>
-                  <v-text-field
-                    v-model="input"
-                    class="module-default__answer-text"
-                    hide-details
-                    flat
-                    placeholder="Answer or comment . . . "
-                    solo
-                    @keydown.enter="comment"
-                  >
-                    <template v-slot:append>
-                      <v-btn small class="mx-0" outlined depressed @click="comment">Post</v-btn>
-                    </template>
-                  </v-text-field>
-                </v-timeline-item>
-                <v-slide-x-transition group>
-                  <v-timeline-item
-                    v-for="event in timeline"
-                    :key="event.id"
-                    class="mb-3"
-                    color="#f79961"
-                    fill-dot
-                    small
-                  >
-                    <template v-slot:icon>
-                      <v-avatar size="20"
-                        ><img
-                          src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
-                      /></v-avatar>
-                    </template>
-                    <v-row justify="space-between">
-                      <v-col
-                        class="module-default__answer-text"
-                        cols="9"
-                        v-text="event.text"
-                      ></v-col>
-                      <!-- <v-col class="text-right" cols="3" v-text="event.time"></v-col> -->
-                      <v-col class="text-right" cols="3">
-                        <!-- POSTER, STUDENT PARTICIPANT OR ORGANIZER CAN DELETE POSTS -->
-                        <!-- <v-btn small class="module__trash" icon
-                          ><v-icon small color="grey" class="module__trash"
-                            >mdi-trash-can-outline</v-icon
-                          ></v-btn
-                        > -->
-
-                        <v-btn class="module__trash" small icon
-                          ><v-icon class="module__trash" small color="grey"
-                            >mdi-thumb-up</v-icon
-                          ></v-btn
-                        >
-                        <!-- ANYONE CAN FLAG COMMENTS -->
-                        <v-btn small class="module__trash" icon
-                          ><v-icon small color="grey lighten-2" class="module__trash"
-                            >mdi-flag</v-icon
-                          ></v-btn
-                        >
-                      </v-col>
-                    </v-row>
-                  </v-timeline-item>
-                </v-slide-x-transition>
-              </v-timeline>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-        <v-expansion-panels accordion flat class="mb-8">
-          <v-expansion-panel>
-            <v-expansion-panel-header hide-actions disabled>
-              <div class="module-default__question-header">Why are there so many posts?</div>
-            </v-expansion-panel-header>
-            <!-- <v-expansion-panel-content></v-expansion-panel-content> -->
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header hide-actions>
-              <div>
-                <v-btn small rounded outlined depressed>1 Replies</v-btn>
-                <v-btn class="ml-2 mr-1" small depressed rounded color="white"
-                  ><v-icon left small color="grey">mdi-thumb-up</v-icon> 10
-                </v-btn>
-                <v-btn class="ml-1 mr-2" small depressed rounded color="white"
-                  ><v-icon left small color="grey">mdi-thumb-down</v-icon> 2
-                </v-btn>
-                <v-btn class="ml-3 mr-2" small icon
-                  ><v-icon small color="grey lighten-2">mdi-flag</v-icon>
-                </v-btn>
-                <v-btn class="ml-6 mr-3" small icon
-                  ><v-icon small color="grey lighten-2">mdi-bookmark</v-icon>
-                </v-btn>
-              </div>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-timeline dense>
-                <v-timeline-item fill-dot class="white--text mb-6" color="#f79961">
-                  <template v-slot:icon>
-                    <v-avatar size="34"
-                      ><img
-                        src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
-                    /></v-avatar>
-                  </template>
-                  <v-text-field
-                    v-model="input"
-                    class="module-default__answer-text"
-                    hide-details
-                    flat
-                    placeholder="Answer or comment . . . "
-                    solo
-                    @keydown.enter="comment"
-                  >
-                    <template v-slot:append>
-                      <v-btn small class="mx-0" outlined depressed @click="comment">Post</v-btn>
-                    </template>
-                  </v-text-field>
-                </v-timeline-item>
-                <v-slide-x-transition group>
-                  <v-timeline-item
-                    v-for="event in timeline"
-                    :key="event.id"
-                    class="mb-3"
-                    color="#f79961"
-                    fill-dot
-                    small
-                  >
-                    <template v-slot:icon>
-                      <v-avatar size="20"
-                        ><img
-                          src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
-                      /></v-avatar>
-                    </template>
-                    <v-row justify="space-between">
-                      <v-col
-                        class="module-default__answer-text"
-                        cols="9"
-                        v-text="event.text"
-                      ></v-col>
-                      <!-- <v-col class="text-right" cols="3" v-text="event.time"></v-col> -->
-                      <v-col class="text-right" cols="3">
-                        <!-- POSTER, STUDENT PARTICIPANT OR ORGANIZER CAN DELETE POSTS -->
-                        <!-- <v-btn small class="module__trash" icon
-                          ><v-icon small color="grey" class="module__trash"
-                            >mdi-trash-can-outline</v-icon
-                          ></v-btn
-                        > -->
-
-                        <v-btn class="module__trash" small icon
-                          ><v-icon class="module__trash" small color="grey"
-                            >mdi-thumb-up</v-icon
-                          ></v-btn
-                        >
-                        <!-- ANYONE CAN FLAG COMMENTS -->
-                        <v-btn small class="module__trash" icon
-                          ><v-icon small color="grey lighten-2" class="module__trash"
-                            >mdi-flag</v-icon
-                          ></v-btn
-                        >
-                      </v-col>
-                    </v-row>
-                  </v-timeline-item>
-                </v-slide-x-transition>
-              </v-timeline>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-        <div class="text-center mt-12">
-          <v-pagination v-model="page" :length="4" circle></v-pagination>
+        <div v-if="timeline.length > 0" class="text-center mt-12">
+          <v-pagination v-model="page" :length="numPages" circle></v-pagination>
         </div>
       </div>
       <!-- DESIGN YOUR ACTIVITY HERE / COMMENT OUT WHEN YOU'VE STARTED DESIGNING -->
@@ -367,54 +104,215 @@
 </template>
 
 <script lang="ts">
-import { ref } from '@vue/composition-api';
+import { defineComponent, ref, computed, PropType } from '@vue/composition-api';
+import { Question as QuestionType, MongoDoc } from '../types';
 import Instruct from './ModuleInstruct.vue';
+import Question from './Question.vue';
 
-export default {
+const filterOptions = [
+  {
+    icon: 'account-supervisor-circle-outline',
+    label: 'All'
+  },
+  {
+    icon: 'comment-question',
+    label: 'My Questions'
+  },
+  {
+    icon: 'bookmark',
+    label: 'Bookmarks'
+  }
+];
+
+const MAX_QUESTIONS_PER_PAGE = 10;
+
+const dummyQuestions = new Array(42).fill().map((e, i) => {
+  return {
+    id: i,
+    author: 2,
+    text: `question ${i}?`,
+    events: [
+      {
+        text: 'a comment',
+        id: 1,
+        time: 'test',
+        likes: 0,
+        liked: false,
+        flagged: false,
+        flags: 0
+      }
+    ],
+    likes: 0,
+    dislikes: 0,
+    liked: false,
+    disliked: false,
+    bookmarked: false,
+    flags: 0,
+    flagged: false
+  };
+});
+
+[...new Array(20)].map((_, i) => {
+  dummyQuestions[41].events.push({
+    text: `comment ${i}`,
+    id: i,
+    time: 'test',
+    likes: 0,
+    liked: false,
+    flagged: false,
+    flags: 0
+  });
+  return 'done';
+});
+
+console.log(dummyQuestions[41].events);
+
+export default defineComponent({
   name: 'ModuleDefault',
   components: {
-    Instruct
+    Instruct,
+    Question
   },
-  apollo: {},
-  // data() {
-  //   const setupInstructions = ref({
-  //     description: '',
-  //     instructions: ['', '', '']
-  //   });
-  //   const showInstructions = ref(true);
-  //   return {
-  //     setupInstructions,
-  //     showInstructions
-  //   };
-  // },
-  data: () => ({
-    events: [],
-    input: null,
-    nonce: 0
-  }),
-  computed: {
-    timeline() {
-      return this.events.slice().reverse();
+  props: {
+    value: {
+      required: true,
+      type: Object as PropType<MongoDoc>
     }
   },
+  setup() {
+    const userID = 1;
+    const page = ref(1);
+    const filter = ref('All');
+    const questions = ref(dummyQuestions);
+    const questionInput = ref('');
 
-  methods: {
-    comment() {
-      const time = new Date().toTimeString();
-      this.events.push({
-        id: this.nonce,
-        text: this.input,
-        time: time.replace(/:\d{2}\sGMT-\d{4}\s\((.*)\)/, (match, contents, offset) => {
-          return ` ${contents
-            .split(' ')
-            .map(v => v.charAt(0))
-            .join('')}`;
+    // Filter and Pagination logic
+    const filteredQuestions = computed(() =>
+      questions.value
+        .filter(question => {
+          if (filter.value === 'Bookmarks') return question.bookmarked;
+          if (filter.value === 'My Questions') return question.author === userID;
+          return true;
         })
-      });
-      this.input = null;
-    }
+        .reverse()
+    );
+
+    const timeline = computed(() =>
+      filteredQuestions.value.slice(
+        (page.value - 1) * MAX_QUESTIONS_PER_PAGE,
+        (page.value - 1) * MAX_QUESTIONS_PER_PAGE + MAX_QUESTIONS_PER_PAGE
+      )
+    );
+
+    const numPages = computed(() =>
+      Math.ceil(filteredQuestions.value.length / MAX_QUESTIONS_PER_PAGE)
+    );
+
+    // Question and Comments Actions
+    const getQuestionIndex = (id: number) =>
+      questions.value.findIndex(question => question.id === id);
+
+    const likeQuestion = (id: number) => {
+      const index = getQuestionIndex(id);
+      const question = questions.value[index];
+      if (!question.liked) {
+        if (question.disliked) question.dislikes -= 1;
+        question.likes += 1;
+        question.liked = true;
+        question.disliked = false;
+      } else {
+        question.likes -= 1;
+        question.liked = false;
+      }
+    };
+
+    const dislikeQuestion = (id: number) => {
+      const index = getQuestionIndex(id);
+      const question = questions.value[index];
+      if (!question.disliked) {
+        if (question.likes) question.likes -= 1;
+        question.dislikes += 1;
+        question.liked = false;
+        question.disliked = true;
+      } else {
+        question.dislikes -= 1;
+        question.disliked = false;
+      }
+    };
+
+    const bookmarkQuestion = (id: number) => {
+      const index = getQuestionIndex(id);
+      const question = questions.value[index];
+      question.bookmarked = !question.bookmarked;
+    };
+
+    const flagQuestion = (id: number) => {
+      const index = getQuestionIndex(id);
+      const question = questions.value[index];
+      if (question.flagged) question.flags -= 1;
+      else question.flags += 1;
+      question.flagged = !question.flagged;
+    };
+
+    const getCommentIndex = (question: QuestionType, id: number) =>
+      question.events.findIndex(comment => comment.id === id);
+
+    const flagComment = (questionID: number, commentID: number) => {
+      const index = getQuestionIndex(questionID);
+      const question = questions.value[index];
+      const commentIndex = getCommentIndex(question, commentID);
+      const comment = question.events[commentIndex];
+      if (comment.flagged) comment.flags -= 1;
+      else comment.flags += 1;
+      comment.flagged = !comment.flagged;
+    };
+
+    const likeComment = (questionID: number, commentID: number) => {
+      const index = getQuestionIndex(questionID);
+      const question = questions.value[index];
+      const commentIndex = getCommentIndex(question, commentID);
+      const comment = question.events[commentIndex];
+      if (!comment.liked) comment.likes += 1;
+      else question.likes -= 1;
+      comment.liked = !comment.liked;
+    };
+
+    const postQuestion = () => {
+      if (questionInput.value.length > 0) {
+        questions.value.push({
+          id: Math.floor(Math.random() * 100 + 42),
+          author: userID,
+          text: questionInput.value,
+          events: [],
+          likes: 0,
+          dislikes: 0,
+          liked: false,
+          disliked: false,
+          bookmarked: false,
+          flags: 0,
+          flagged: false
+        });
+        questionInput.value = '';
+      }
+    };
+
+    return {
+      page,
+      numPages,
+      filterOptions,
+      filter,
+      postQuestion,
+      timeline,
+      questionInput,
+      likeQuestion,
+      dislikeQuestion,
+      bookmarkQuestion,
+      flagQuestion,
+      likeComment,
+      flagComment
+    };
   }
-};
+});
 </script>
 
 <style lang="scss">

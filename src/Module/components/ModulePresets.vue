@@ -3,7 +3,12 @@
     <div class="module-outcomes__container">
       <!-- <v-divider class="presets__divider"></v-divider> -->
       <div class="presets__section-title">General</div>
-      <div class="presets__nopresets">No tweaking necessary</div>
+      <v-select
+        :items="maxQuestionsItems"
+        outlined
+        label="Maximum questions each team can ask"
+      ></v-select>
+
       <v-divider class="presets__divider"></v-divider>
       <div class="presets__section-title">Instructions</div>
       <Instruct v-model="setupInstructions" />
@@ -74,6 +79,7 @@ export default {
   },
   apollo: {},
   setup() {
+    const maxQuestionsItems = [...Array(10).keys()].map(i => i + 1);
     const presets = reactive({
       group: ['Setup', 'Project', 'Screening', 'Internship'],
       required: ['Creator requires this activity', 'Yes', 'No'],
@@ -99,7 +105,8 @@ export default {
     });
     return {
       ...toRefs(presets),
-      setupInstructions
+      setupInstructions,
+      maxQuestionsItems
     };
   }
 };
