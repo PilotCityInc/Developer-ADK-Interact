@@ -94,7 +94,7 @@
         <div v-else class="text-center module-default__question-header">No questions yet!</div>
 
         <div v-if="timeline.length > 0" class="text-center mt-12">
-          <v-pagination v-model="page" :length="numPages" circle></v-pagination>
+          <v-pagination v-model="page" :length="numPages" circle @input="scrollUp"></v-pagination>
         </div>
       </div>
       <!-- DESIGN YOUR ACTIVITY HERE / COMMENT OUT WHEN YOU'VE STARTED DESIGNING -->
@@ -185,6 +185,10 @@ export default defineComponent({
     const filter = ref('All');
     const questions = ref(dummyQuestions);
     const questionInput = ref('');
+
+    const scrollUp = () => {
+      window.scrollTo(0, 300);
+    };
 
     // Filter and Pagination logic
     const filteredQuestions = computed(() =>
@@ -297,6 +301,7 @@ export default defineComponent({
     };
 
     return {
+      scrollUp,
       page,
       numPages,
       filterOptions,
