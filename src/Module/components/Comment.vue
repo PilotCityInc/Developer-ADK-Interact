@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType, computed } from '@vue/composition-api';
+import { defineComponent, PropType } from '@vue/composition-api';
 import { Comment } from '../types';
 
 export default defineComponent({
