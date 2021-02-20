@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, ref, toRefs, PropType, watch } from '@vue/composition-api';
+import { reactive, ref, toRefs, PropType } from '@vue/composition-api';
 import { createLoader, getModAdk, getModMongoDoc } from 'pcv4lib/src';
 import Instruct from './ModuleInstruct.vue';
 import { MongoDoc } from '../types';
