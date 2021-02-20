@@ -4,6 +4,7 @@
       <!-- <v-divider class="presets__divider"></v-divider> -->
       <div class="presets__section-title">General</div>
       <v-select
+        v-model="adkData.maxQuestions"
         :items="maxQuestionsItems"
         outlined
         label="Maximum questions each team can ask"
@@ -68,18 +69,29 @@
 </template>
 
 <script lang="ts">
-import { reactive, ref, toRefs } from '@vue/composition-api';
+import { reactive, ref, toRefs, PropType } from '@vue/composition-api';
+import { createLoader, getModAdk } from 'pcv4lib/src';
 import Instruct from './ModuleInstruct.vue';
-// import gql from 'graphql-tag';
+import { MongoDoc } from '../types';
 
 export default {
   name: 'ModulePresets',
   components: {
     Instruct
   },
-  apollo: {},
-  setup() {
+  props: {
+    value: {
+      required: true,
+      type: Object as PropType<MongoDoc>
+    }
+  },
+  setup(props, ctx) {
+    const defaultForumProps = {
+      maxQuestions: 2
+    };
+    const { adkData } = getModAdk(props, ctx.emit, 'forum', defaultForumProps);
     const maxQuestionsItems = [...Array(10).keys()].map(i => i + 1);
+
     const presets = reactive({
       group: ['Setup', 'Project', 'Screening', 'Internship'],
       required: ['Creator requires this activity', 'Yes', 'No'],
@@ -99,11 +111,14 @@ export default {
         'No'
       ]
     });
+
     const setupInstructions = ref({
       description: '',
       instructions: ['', '', '']
     });
+
     return {
+      adkData,
       ...toRefs(presets),
       setupInstructions,
       maxQuestionsItems
