@@ -46,11 +46,12 @@
       <!-- ENTER CONTENT HERE -->
       <div class="module-default__row">
         <v-text-field
+          v-model="questionInput"
           rounded
           class="mr-4"
-          v-model="questionInput"
           outlined
-          placeholder="You have 2 questions remaining"
+          :disabled="questionsRemaining <= 0"
+          :placeholder="`You have ${questionsRemaining} questions remaining`"
         >
         </v-text-field>
         <v-btn color="#f79961" rounded dark depressed x-large @click="postQuestion"
@@ -105,6 +106,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, PropType } from '@vue/composition-api';
+import { getModAdk } from 'pcv4lib/src';
 import { Question as QuestionType, MongoDoc } from '../types';
 import Instruct from './ModuleInstruct.vue';
 import Question from './Question.vue';
@@ -165,8 +167,6 @@ const dummyQuestions = new Array(42).fill().map((e, i) => {
   return 'done';
 });
 
-console.log(dummyQuestions[41].events);
-
 export default defineComponent({
   name: 'ModuleDefault',
   components: {
@@ -179,7 +179,8 @@ export default defineComponent({
       type: Object as PropType<MongoDoc>
     }
   },
-  setup() {
+  setup(props, ctx) {
+    const { adkData } = getModAdk(props, ctx.emit, 'forum');
     const userID = 1;
     const page = ref(1);
     const filter = ref('All');
@@ -211,6 +212,13 @@ export default defineComponent({
     const numPages = computed(() =>
       Math.ceil(filteredQuestions.value.length / MAX_QUESTIONS_PER_PAGE)
     );
+
+    const questionsRemaining = computed(() => {
+      const userQuestions = questions.value.filter(question => {
+        return question.author === userID;
+      }).length;
+      return adkData.value.maxQuestions - userQuestions;
+    });
 
     // Question and Comments Actions
     const getQuestionIndex = (id: number) =>
@@ -301,6 +309,7 @@ export default defineComponent({
     };
 
     return {
+      questionsRemaining,
       scrollUp,
       page,
       numPages,

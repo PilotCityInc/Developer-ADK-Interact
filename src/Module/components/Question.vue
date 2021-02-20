@@ -62,7 +62,7 @@ export default defineComponent({
       type: Object as PropType<Question>
     }
   },
-  setup(props) {
+  setup() {
     const openPanels = ref<number | null>(null);
 
     const toggleComments = () => {

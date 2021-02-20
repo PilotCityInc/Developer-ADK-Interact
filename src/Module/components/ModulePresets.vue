@@ -4,11 +4,17 @@
       <!-- <v-divider class="presets__divider"></v-divider> -->
       <div class="presets__section-title">General</div>
       <v-select
+        v-model="adkData.maxQuestions"
         :items="maxQuestionsItems"
         outlined
         label="Maximum questions each team can ask"
       ></v-select>
-
+      <div class="text-center">
+        <v-btn x-large outlined depressed :loading="loading" @click="process()">Save</v-btn>
+      </div>
+      <v-alert v-if="success || error" :type="success ? 'success' : 'error'" class="mt-2">{{
+        message
+      }}</v-alert>
       <v-divider class="presets__divider"></v-divider>
       <div class="presets__section-title">Instructions</div>
       <Instruct v-model="setupInstructions" />
@@ -68,18 +74,30 @@
 </template>
 
 <script lang="ts">
-import { reactive, ref, toRefs } from '@vue/composition-api';
+import { reactive, ref, toRefs, PropType } from '@vue/composition-api';
+import { createLoader, getModAdk, getModMongoDoc } from 'pcv4lib/src';
 import Instruct from './ModuleInstruct.vue';
-// import gql from 'graphql-tag';
+import { MongoDoc } from '../types';
 
 export default {
   name: 'ModulePresets',
   components: {
     Instruct
   },
-  apollo: {},
-  setup() {
+  props: {
+    value: {
+      required: true,
+      type: Object as PropType<MongoDoc>
+    }
+  },
+  setup(props, ctx) {
+    const defaultForumProps = {
+      maxQuestions: 2
+    };
+    const { adkData } = getModAdk(props, ctx.emit, 'forum', defaultForumProps);
+    const { programDoc } = getModMongoDoc(props, ctx.emit);
     const maxQuestionsItems = [...Array(10).keys()].map(i => i + 1);
+
     const presets = reactive({
       group: ['Setup', 'Project', 'Screening', 'Internship'],
       required: ['Creator requires this activity', 'Yes', 'No'],
@@ -99,12 +117,16 @@ export default {
         'No'
       ]
     });
+
     const setupInstructions = ref({
       description: '',
       instructions: ['', '', '']
     });
+
     return {
+      adkData,
       ...toRefs(presets),
+      ...createLoader(programDoc.value.save, 'Saved Successfully', 'Could not save at this time'),
       setupInstructions,
       maxQuestionsItems
     };

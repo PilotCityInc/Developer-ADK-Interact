@@ -86,7 +86,7 @@
           stream
         />
         <div v-if="currentPage != 'preview'" class="module__pagination">
-          <div v-for="page in subpages" :key="page" :class="{ active: currentPage == page }">
+          <div v-for="page in subpages" :key="page" :class="{ active: currentPage === page }">
             <div class="module__pagination-button--active" />
             <v-btn
               :ripple="false"
@@ -269,6 +269,7 @@ body {
 <script lang="ts">
 import { computed, reactive, ref, toRefs, defineComponent, PropType } from '@vue/composition-api';
 import '../styles/module.scss';
+import { getModMongoDoc } from 'pcv4lib/src';
 import { MongoDoc } from './types';
 import * as Module from './components';
 
@@ -281,8 +282,15 @@ export default defineComponent({
     'module-presets': Module.Presets,
     'module-preview': Module.Default
   },
+  props: {
+    value: {
+      required: true,
+      type: Object as PropType<MongoDoc>
+    }
+  },
   setup(props, ctx) {
     // ENTER ACTIVITY NAME BELOW
+    const { programDoc } = getModMongoDoc(props, ctx.emit);
     const moduleName = ref('Forum');
     const page = reactive({
       subpages: ['Setup', 'Presets', 'Monitor'],
@@ -336,6 +344,7 @@ export default defineComponent({
       timelineData.input = '';
     }
     return {
+      programDoc,
       ...toRefs(color),
       ...toRefs(page),
       config,
