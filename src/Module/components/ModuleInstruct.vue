@@ -85,12 +85,12 @@ export default defineComponent({
     //   }
     // });
     const boilerInstructions = ref([
-      'Click resource link',
-      'Review, complete or understand resource contents',
-      'Mark completed until all finished'
+      'Ask questions up to the limit',
+      'Review, answer or make comments to community questions',
+      'Upvote, downvote, bookmark & await answers to your questions'
     ]);
     const goal = ref([
-      'To research employer-provided resources, links, examples, possibilities & direction for projects'
+      'To ask & answer questions with your student peers in the program to collectively advance your projects'
     ]);
     // function populate() {
     //   boilerInstructions.value.push('');
