@@ -23,7 +23,7 @@
             </template>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <Instruct readonly />
+            <Instruct v-model="setupInstructions" readonly />
             <div @click="showInstructions = true">
               <div class="module-default__collapse-title">CLOSE</div>
               <!-- <div class="hr"/> OPTIONAL -->
@@ -186,6 +186,11 @@ export default defineComponent({
     const filter = ref('All');
     const questions = ref(dummyQuestions);
     const questionInput = ref('');
+    const showInstructions = ref(true);
+    const setupInstructions = ref({
+      description: '',
+      instructions: ['', '', '']
+    });
 
     const scrollUp = () => {
       window.scrollTo(0, 300);
@@ -310,6 +315,8 @@ export default defineComponent({
 
     return {
       questionsRemaining,
+      showInstructions,
+      setupInstructions,
       scrollUp,
       page,
       numPages,
