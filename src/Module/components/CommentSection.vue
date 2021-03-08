@@ -25,14 +25,15 @@
       <v-slide-x-transition group>
         <Comment
           v-for="comment in visibleComments"
-          :key="comment.id"
+          :key="comment._id.toString()"
+          :student-adk-data="studentAdkData"
           :comment="comment"
-          :question-id="question.id"
+          :question-id="question._id"
           v-on="$listeners"
         />
       </v-slide-x-transition>
     </v-timeline>
-    <div v-if="numComments <= question.events.length" class="text-center">
+    <div v-if="numComments <= question.comments.length" class="text-center">
       <v-btn small depressed outlined @click="numComments += 5">Load more</v-btn>
     </div>
   </v-expansion-panel-content>
@@ -40,6 +41,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, PropType, computed } from '@vue/composition-api';
+import { ObjectId } from 'bson';
 import { Question } from '../types';
 import Comment from './Comment.vue';
 
@@ -50,21 +52,25 @@ export default defineComponent({
     question: {
       required: true,
       type: Object as PropType<Question>
+    },
+    studentAdkData: {
+      required: true,
+      type: Object
     }
   },
-  setup(props) {
+  setup(props, ctx) {
     const commentInput = ref('');
     const numComments = ref(5);
 
     const visibleComments = computed(() =>
-      props.question.events.slice().reverse().slice(0, numComments.value)
+      props.question.comments.slice().reverse().slice(0, numComments.value)
     );
 
     const comment = () => {
       if (commentInput.value.length > 0) {
         const time = new Date().toTimeString();
-        props.question.events.push({
-          id: Math.random() * 20,
+        ctx.emit('postComment', props.question._id, {
+          _id: new ObjectId(),
           text: commentInput.value,
           time: time.replace(/:\d{2}\sGMT-\d{4}\s\((.*)\)/, (match, contents, offset) => {
             return ` ${contents
@@ -72,9 +78,7 @@ export default defineComponent({
               .map(v => v.charAt(0))
               .join('')}`;
           }),
-          liked: false,
           likes: 0,
-          flagged: false,
           flags: 0
         });
         commentInput.value = '';

@@ -9,7 +9,7 @@
       <v-expansion-panel-header hide-actions>
         <div>
           <v-btn small rounded outlined depressed @click="toggleComments"
-            >{{ question.events.length }} Replies</v-btn
+            >{{ question.comments.length }} Replies</v-btn
           >
 
           <v-btn
@@ -18,8 +18,13 @@
             depressed
             rounded
             color="white"
-            @click="$emit('likeQuestion', question.id)"
-            ><v-icon left small :color="question.liked ? 'green' : 'grey'">mdi-thumb-up</v-icon>
+            @click="$emit('likeQuestion', question._id)"
+            ><v-icon
+              left
+              small
+              :color="questionIsLiked(studentAdkData, question) ? 'green' : 'grey'"
+              >mdi-thumb-up</v-icon
+            >
             {{ question.likes }}
           </v-btn>
           <v-btn
@@ -28,30 +33,47 @@
             depressed
             rounded
             color="white"
-            @click="$emit('dislikeQuestion', question.id)"
-            ><v-icon left small :color="question.disliked ? 'red' : 'grey'">mdi-thumb-down</v-icon>
+            @click="$emit('dislikeQuestion', question._id)"
+            ><v-icon
+              left
+              small
+              :color="questionIsDisliked(studentAdkData, question) ? 'red' : 'grey'"
+              >mdi-thumb-down</v-icon
+            >
             {{ question.dislikes }}
           </v-btn>
-
-          <v-btn class="ml-3 mr-2" small icon @click="$emit('flagQuestion', question.id)"
-            ><v-icon small :color="question.flagged ? 'red' : 'grey lighten-2'">mdi-flag</v-icon>
+          <v-btn class="ml-3 mr-2" small icon @click="$emit('flagQuestion', question._id)"
+            ><v-icon
+              small
+              :color="questionIsFlagged(studentAdkData, question) ? 'red' : 'grey lighten-2'"
+              >mdi-flag</v-icon
+            >
           </v-btn>
-          <v-btn class="ml-6 mr-3" small icon @click="$emit('bookmarkQuestion', question.id)"
-            ><v-icon small :color="question.bookmarked ? 'black' : 'grey lighten-2'"
+          <v-btn class="ml-6 mr-3" small icon @click="$emit('bookmarkQuestion', question._id)"
+            ><v-icon
+              small
+              :color="questionIsBookmarked(studentAdkData, question) ? 'black' : 'grey lighten-2'"
               >mdi-bookmark</v-icon
             >
           </v-btn>
         </div>
       </v-expansion-panel-header>
-      <CommentSection :question="question" v-on="$listeners" />
+      <CommentSection :question="question" :student-adk-data="studentAdkData" v-on="$listeners" />
     </v-expansion-panel>
   </v-expansion-panels>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType } from '@vue/composition-api';
+import { defineComponent, ref, PropType, computed } from '@vue/composition-api';
 import CommentSection from './CommentSection.vue';
 import { Question } from '../types';
+import {
+  questionIsBookmarked,
+  questionIsDisliked,
+  questionIsLiked,
+  questionIsFlagged,
+  removeId
+} from './helpers';
 
 export default defineComponent({
   name: 'Question',
@@ -60,17 +82,23 @@ export default defineComponent({
     question: {
       required: true,
       type: Object as PropType<Question>
+    },
+    studentAdkData: {
+      required: true,
+      type: Object
     }
   },
-  setup() {
+  setup(props) {
     const openPanels = ref<number | null>(null);
-
     const toggleComments = () => {
       if (openPanels.value) openPanels.value = null;
       else openPanels.value = 1;
     };
-
     return {
+      questionIsLiked,
+      questionIsBookmarked,
+      questionIsDisliked,
+      questionIsFlagged,
       openPanels,
       toggleComments
     };

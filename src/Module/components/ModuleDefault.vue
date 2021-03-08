@@ -82,12 +82,14 @@
         <div v-if="timeline.length > 0">
           <Question
             v-for="question in timeline"
-            :key="question.id"
+            :key="question._id.toString()"
+            :student-adk-data="studentAdkData"
             :question="question"
             @likeQuestion="likeQuestion"
             @dislikeQuestion="dislikeQuestion"
             @bookmarkQuestion="bookmarkQuestion"
             @flagQuestion="flagQuestion"
+            @postComment="postComment"
             @likeComment="likeComment"
             @flagComment="flagComment"
           />
@@ -105,9 +107,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, PropType } from '@vue/composition-api';
-import { getModAdk } from 'pcv4lib/src';
+import {
+  defineComponent,
+  ref,
+  computed,
+  PropType,
+  reactive,
+  toRef,
+  toRefs
+} from '@vue/composition-api';
+import { getModAdk, getModMongoDoc } from 'pcv4lib/src';
+import { Db, ObjectId } from 'mongodb';
 import { Question as QuestionType, MongoDoc } from '../types';
+import {
+  questionIsBookmarked,
+  questionIsDisliked,
+  questionIsFlagged,
+  questionIsLiked,
+  commentIsLiked,
+  commentIsFlagged,
+  removeId
+} from './helpers';
 import Instruct from './ModuleInstruct.vue';
 import Question from './Question.vue';
 
@@ -128,45 +148,6 @@ const filterOptions = [
 
 const MAX_QUESTIONS_PER_PAGE = 10;
 
-const dummyQuestions = new Array(42).fill().map((e, i) => {
-  return {
-    id: i,
-    author: 2,
-    text: `question ${i}?`,
-    events: [
-      {
-        text: 'a comment',
-        id: 1,
-        time: 'test',
-        likes: 0,
-        liked: false,
-        flagged: false,
-        flags: 0
-      }
-    ],
-    likes: 0,
-    dislikes: 0,
-    liked: false,
-    disliked: false,
-    bookmarked: false,
-    flags: 0,
-    flagged: false
-  };
-});
-
-[...new Array(20)].map((_, i) => {
-  dummyQuestions[41].events.push({
-    text: `comment ${i}`,
-    id: i,
-    time: 'test',
-    likes: 0,
-    liked: false,
-    flagged: false,
-    flags: 0
-  });
-  return 'done';
-});
-
 export default defineComponent({
   name: 'ModuleDefault',
   components: {
@@ -177,31 +158,86 @@ export default defineComponent({
     value: {
       required: true,
       type: Object as PropType<MongoDoc>
+    },
+    teamDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc>,
+      default: () => {}
+    },
+    studentDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc>,
+      default: () => {}
+    },
+    db: {
+      required: false,
+      type: Object as PropType<Db>,
+      default: () => {}
     }
   },
   setup(props, ctx) {
-    const { adkData } = getModAdk(props, ctx.emit, 'forum');
-    const userID = 1;
-    const page = ref(1);
-    const filter = ref('All');
-    const questions = ref(dummyQuestions);
-    const questionInput = ref('');
-    const showInstructions = ref(true);
-    const setupInstructions = ref({
-      description: '',
-      instructions: ['', '', '']
+    const state = reactive({
+      page: 1,
+      filter: 'All',
+      questionInput: '',
+      questions: [] as QuestionType[],
+      programDoc: null as null | MongoDoc,
+      teamDocument: null as null | MongoDoc,
+      studentDocument: null as null | MongoDoc,
+      showInstructions: true,
+      setupInstructions: {
+        description: '',
+        instructions: ['', '', '']
+      }
     });
+
+    state.programDoc = getModMongoDoc(props, ctx.emit);
+    if (props.teamDoc)
+      state.teamDocument = getModMongoDoc(props, ctx.emit, {}, 'teamDoc', 'inputTeamDoc');
+    if (props.studentDoc)
+      state.studentDocument = getModMongoDoc(props, ctx.emit, {}, 'studentDoc', 'inputStudentDoc');
+
+    const { adkData } = getModAdk(props, ctx.emit, 'forum');
+
+    const defaultStudentAdkData = {
+      bookmarkedQuestions: [],
+      likedQuestions: [],
+      dislikedQuestions: [],
+      flaggedQuestions: [],
+      likedComments: [],
+      flaggedComments: []
+    };
+
+    const { adkData: studentAdkData } = getModAdk(
+      props,
+      ctx.emit,
+      'forum',
+      defaultStudentAdkData,
+      'studentDoc',
+      'inputStudentDoc'
+    );
+
+    const fetchQuestions = async () => {
+      state.questions = await props.db
+        .collection('Question')
+        .find({ programId: props.value!.data._id })
+        .toArray();
+    };
+    fetchQuestions();
 
     const scrollUp = () => {
       window.scrollTo(0, 300);
     };
 
     // Filter and Pagination logic
+    // ! use db Find here
     const filteredQuestions = computed(() =>
-      questions.value
+      state.questions
         .filter(question => {
-          if (filter.value === 'Bookmarks') return question.bookmarked;
-          if (filter.value === 'My Questions') return question.author === userID;
+          if (state.filter === 'Bookmarks')
+            return questionIsBookmarked(studentAdkData.value, question);
+          if (state.filter === 'My Questions')
+            return question.author === state.studentDocument!.data._id;
           return true;
         })
         .reverse()
@@ -209,8 +245,8 @@ export default defineComponent({
 
     const timeline = computed(() =>
       filteredQuestions.value.slice(
-        (page.value - 1) * MAX_QUESTIONS_PER_PAGE,
-        (page.value - 1) * MAX_QUESTIONS_PER_PAGE + MAX_QUESTIONS_PER_PAGE
+        (state.page - 1) * MAX_QUESTIONS_PER_PAGE,
+        (state.page - 1) * MAX_QUESTIONS_PER_PAGE + MAX_QUESTIONS_PER_PAGE
       )
     );
 
@@ -219,118 +255,171 @@ export default defineComponent({
     );
 
     const questionsRemaining = computed(() => {
-      const userQuestions = questions.value.filter(question => {
-        return question.author === userID;
-      }).length;
-      return adkData.value.maxQuestions - userQuestions;
+      console.log(state.teamDocument!);
+      const teamQuestions = state.teamDocument!.data.questionsAsked.length;
+      return adkData.value.maxQuestions - teamQuestions;
     });
 
     // Question and Comments Actions
-    const getQuestionIndex = (id: number) =>
-      questions.value.findIndex(question => question.id === id);
 
-    const likeQuestion = (id: number) => {
-      const index = getQuestionIndex(id);
-      const question = questions.value[index];
-      if (!question.liked) {
-        if (question.disliked) question.dislikes -= 1;
+    const likeQuestion = async (_id: ObjectId) => {
+      const question = await props.db.collection('Question').findOne({ _id });
+      if (!questionIsLiked(studentAdkData.value, question)) {
+        if (questionIsDisliked(studentAdkData.value, question)) question.dislikes -= 1;
         question.likes += 1;
-        question.liked = true;
-        question.disliked = false;
+        studentAdkData.value.likedQuestions.push(_id.toString()); // question.liked = true
+        studentAdkData.value.dislikedQuestions = removeId(
+          studentAdkData.value.dislikedQuestions,
+          _id
+        );
       } else {
         question.likes -= 1;
-        question.liked = false;
+        studentAdkData.value.likedQuestions = removeId(studentAdkData.value.likedQuestions, _id); // question.liked = false
       }
+      props.db
+        .collection('Question')
+        .updateOne({ _id }, { $set: { likes: question.likes, dislikes: question.likes } });
+      state.studentDocument!.update();
+      fetchQuestions();
     };
 
-    const dislikeQuestion = (id: number) => {
-      const index = getQuestionIndex(id);
-      const question = questions.value[index];
-      if (!question.disliked) {
-        if (question.likes) question.likes -= 1;
+    const dislikeQuestion = async (_id: ObjectId) => {
+      const question = await props.db.collection('Question').findOne({ _id });
+      if (!questionIsDisliked(studentAdkData.value, question)) {
+        if (questionIsLiked(studentAdkData.value, question)) question.likes -= 1;
         question.dislikes += 1;
-        question.liked = false;
-        question.disliked = true;
+        studentAdkData.value.likedQuestions = removeId(studentAdkData.value.likedQuestions, _id);
+        studentAdkData.value.dislikedQuestions.push(_id.toString());
       } else {
         question.dislikes -= 1;
-        question.disliked = false;
+        studentAdkData.value.dislikedQuestions = removeId(
+          studentAdkData.value.dislikedQuestions,
+          _id
+        );
       }
+      props.db
+        .collection('Question')
+        .updateOne({ _id }, { $set: { likes: question.likes, dislikes: question.likes } });
+      state.studentDocument!.update();
+      fetchQuestions();
     };
 
-    const bookmarkQuestion = (id: number) => {
-      const index = getQuestionIndex(id);
-      const question = questions.value[index];
-      question.bookmarked = !question.bookmarked;
+    const bookmarkQuestion = (_id: ObjectId) => {
+      if (studentAdkData.value.bookmarkedQuestions.some((id: string) => id === _id.toString()))
+        studentAdkData.value.bookmarkedQuestions = removeId(
+          studentAdkData.value.bookmarkedQuestions,
+          _id
+        );
+      else studentAdkData.value.bookmarkedQuestions.push(_id.toString());
+      state.studentDocument!.update();
     };
 
-    const flagQuestion = (id: number) => {
-      const index = getQuestionIndex(id);
-      const question = questions.value[index];
-      if (question.flagged) question.flags -= 1;
+    const flagQuestion = async (_id: ObjectId) => {
+      const question = await props.db.collection('Question').findOne({ _id });
+      if (questionIsFlagged(studentAdkData.value, question)) question.flags -= 1;
       else question.flags += 1;
-      question.flagged = !question.flagged;
+      if (studentAdkData.value.flaggedQuestions.some((id: string) => id === _id.toString()))
+        studentAdkData.value.flaggedQuestions = removeId(
+          studentAdkData.value.flaggedQuestions,
+          _id
+        );
+      else studentAdkData.value.flaggedQuestions.push(_id.toString());
+      props.db.collection('Question').updateOne({ _id }, { $set: { flags: question.flags } });
+      state.studentDocument!.update();
+      fetchQuestions();
     };
 
-    const getCommentIndex = (question: QuestionType, id: number) =>
-      question.events.findIndex(comment => comment.id === id);
+    const getCommentIndex = (question: QuestionType, id: ObjectId) =>
+      question.comments.findIndex(comment => comment._id === id);
 
-    const flagComment = (questionID: number, commentID: number) => {
-      const index = getQuestionIndex(questionID);
-      const question = questions.value[index];
+    const flagComment = async (questionID: ObjectId, commentID: ObjectId) => {
+      const question = await props.db.collection('Question').findOne({ _id: questionID });
       const commentIndex = getCommentIndex(question, commentID);
-      const comment = question.events[commentIndex];
-      if (comment.flagged) comment.flags -= 1;
+      const comment = question.comments[commentIndex];
+      if (commentIsFlagged(studentAdkData.value, comment)) comment.flags -= 1;
       else comment.flags += 1;
-      comment.flagged = !comment.flagged;
+      props.db
+        .collection('Question')
+        .updateOne(
+          { _id: questionID, 'comments._id': commentID },
+          { $set: { 'comments.$.flags': comment.flags } }
+        );
+      if (studentAdkData.value.flaggedComments.some((id: string) => id === commentID.toString()))
+        studentAdkData.value.flaggedComments = removeId(
+          studentAdkData.value.flaggedComments,
+          commentID
+        );
+      else studentAdkData.value.flaggedComments.push(commentID.toString());
+      state.studentDocument!.update();
+      fetchQuestions();
     };
 
-    const likeComment = (questionID: number, commentID: number) => {
-      const index = getQuestionIndex(questionID);
-      const question = questions.value[index];
+    const likeComment = async (questionID: ObjectId, commentID: ObjectId) => {
+      console.log(questionID, commentID);
+      const question = await props.db.collection('Question').findOne({ _id: questionID });
       const commentIndex = getCommentIndex(question, commentID);
-      const comment = question.events[commentIndex];
-      if (!comment.liked) comment.likes += 1;
-      else question.likes -= 1;
-      comment.liked = !comment.liked;
+      const comment = question.comments[commentIndex];
+      if (!commentIsLiked(studentAdkData.value, comment)) comment.likes += 1;
+      else comment.likes -= 1;
+      props.db
+        .collection('Question')
+        .updateOne(
+          { _id: questionID, 'comments._id': commentID },
+          { $set: { 'comments.$.likes': comment.likes } }
+        );
+      if (studentAdkData.value.likedComments.some((id: string) => id === commentID.toString()))
+        studentAdkData.value.likedComments = removeId(
+          studentAdkData.value.likedComments,
+          commentID
+        );
+      else studentAdkData.value.likedComments.push(commentID.toString());
+      console.log(studentAdkData.value);
+      state.studentDocument!.update();
+      fetchQuestions();
     };
 
-    const postQuestion = () => {
-      if (questionInput.value.length > 0) {
-        questions.value.push({
-          id: Math.floor(Math.random() * 100 + 42),
-          author: userID,
-          text: questionInput.value,
-          events: [],
+    const postQuestion = async () => {
+      if (state.questionInput.length > 0) {
+        const question = {
+          author: state.studentDocument!.data._id,
+          text: state.questionInput,
+          comments: [],
           likes: 0,
           dislikes: 0,
-          liked: false,
-          disliked: false,
-          bookmarked: false,
-          flags: 0,
-          flagged: false
-        });
-        questionInput.value = '';
+          flags: 0
+        };
+        const { insertedId } = await props.db.collection('Question').insertOne(question);
+        fetchQuestions();
+        state.teamDocument!.data.questionsAsked.push(insertedId);
+        state.teamDocument!.update();
+        state.questionInput = '';
       }
+    };
+
+    const postComment = (questionID: ObjectId, comment: Record<string, any>) => {
+      props.db
+        .collection('Question')
+        .updateOne({ _id: questionID }, { $push: { comments: comment } });
+      fetchQuestions();
     };
 
     return {
+      studentAdkData,
       questionsRemaining,
-      showInstructions,
-      setupInstructions,
+      ...toRefs(state),
       scrollUp,
-      page,
       numPages,
       filterOptions,
-      filter,
       postQuestion,
       timeline,
-      questionInput,
       likeQuestion,
       dislikeQuestion,
       bookmarkQuestion,
       flagQuestion,
+      postComment,
       likeComment,
-      flagComment
+      flagComment,
+      questionIsFlagged
     };
   }
 });

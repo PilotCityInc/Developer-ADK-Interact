@@ -82,7 +82,7 @@
 
 <script lang="ts">
 import { reactive, ref, toRefs, PropType } from '@vue/composition-api';
-import { createLoader, getModAdk, getModMongoDoc } from 'pcv4lib/src';
+import { loading, getModAdk, getModMongoDoc } from 'pcv4lib/src';
 import Instruct from './ModuleInstruct.vue';
 import { MongoDoc } from '../types';
 
@@ -98,11 +98,8 @@ export default {
     }
   },
   setup(props, ctx) {
-    const defaultForumProps = {
-      maxQuestions: 2
-    };
-    const { adkData } = getModAdk(props, ctx.emit, 'forum', defaultForumProps);
-    const { programDoc } = getModMongoDoc(props, ctx.emit);
+    const { adkData } = getModAdk(props, ctx.emit, 'forum');
+    const programDoc = getModMongoDoc(props, ctx.emit);
     const maxQuestionsItems = [...Array(10).keys()].map(i => i + 1);
 
     const presets = reactive({
@@ -133,7 +130,7 @@ export default {
     return {
       adkData,
       ...toRefs(presets),
-      ...createLoader(programDoc.value.save, 'Saved Successfully', 'Could not save at this time'),
+      ...loading(programDoc.value.update, 'Saved Successfully', 'Could not save at this time'),
       setupInstructions,
       maxQuestionsItems
     };

@@ -103,7 +103,15 @@
         </div>
         <div class="module__page">
           <keep-alive>
-            <component :is="getComponent" v-model="programDoc" />
+            <component
+              :is="getComponent"
+              v-model="programDoc"
+              :db="db"
+              :team-doc="teamDoc"
+              :student-doc="studentDoc"
+              @inputTeamDoc="$emit('inputTeamDoc', $event)"
+              @inputStudentDoc="$emit('inputStudentDoc', $event)"
+            />
           </keep-alive>
         </div>
       </div>
@@ -263,7 +271,7 @@ body {
 <script lang="ts">
 import { computed, reactive, ref, toRefs, defineComponent, PropType } from '@vue/composition-api';
 import '../styles/module.scss';
-import { getModMongoDoc } from 'pcv4lib/src';
+import { getModMongoDoc, getModAdk } from 'pcv4lib/src';
 import { MongoDoc } from './types';
 import * as Module from './components';
 
@@ -280,11 +288,35 @@ export default defineComponent({
     value: {
       required: true,
       type: Object as PropType<MongoDoc>
+    },
+    teamDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc | null>,
+      default: () => {}
+    },
+    studentDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc | null>,
+      default: () => {}
+    },
+    db: {
+      required: false,
+      type: Object as PropType<Db>,
+      default: () => {}
     }
   },
   setup(props, ctx) {
     // ENTER ACTIVITY NAME BELOW
-    const { programDoc } = getModMongoDoc(props, ctx.emit);
+    const defaultForumProps = {
+      maxQuestions: 2
+    };
+    getModAdk(props, ctx.emit, 'forum', defaultForumProps);
+    const defaultTeamData = {
+      questionsAsked: []
+    };
+    getModMongoDoc(props, ctx.emit, defaultTeamData, 'teamDoc', 'inputTeamDoc');
+    const programDoc = getModMongoDoc(props, ctx.emit);
+
     const moduleName = ref('Forum');
     const page = reactive({
       subpages: ['Setup', 'Presets'],

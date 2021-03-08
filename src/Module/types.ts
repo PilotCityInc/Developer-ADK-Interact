@@ -1,31 +1,25 @@
+import { ObjectId } from 'bson';
+
 export interface Question {
-  id: number;
+  _id: ObjectId;
   author: number;
   text: string;
-  events: Comment[];
+  comments: Comment[];
   likes: number;
   dislikes: number;
-  liked: boolean;
-  disliked: boolean;
-  bookmarked: boolean;
-  flagged: boolean;
   flags: number;
 }
 
 export interface Comment {
-  id: number;
+  _id: ObjectId;
   text: string;
   time: string;
-  liked: boolean;
   likes: number;
-  flagged: boolean;
   flags: number;
 }
 
 export interface MongoDoc {
-  data: {
-    adks: Record<string, any>[];
-  };
-  save: () => Promise<any>;
+  data: Record<string, any>;
+  update: () => Promise<any>;
   changeStream: any;
 }

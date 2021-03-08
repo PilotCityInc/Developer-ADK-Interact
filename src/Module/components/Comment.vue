@@ -21,8 +21,11 @@
           class="module__trash"
           small
           icon
-          @click="$emit('likeComment', questionId, comment.id)"
-          ><v-icon class="module__trash" small :color="comment.liked ? 'red' : 'grey'"
+          @click="$emit('likeComment', questionId, comment._id)"
+          ><v-icon
+            class="module__trash"
+            small
+            :color="commentIsLiked(studentAdkData, comment) ? 'red' : 'grey'"
             >mdi-heart</v-icon
           ></v-btn
         >
@@ -31,8 +34,11 @@
           small
           class="module__trash"
           icon
-          @click="$emit('flagComment', questionId, comment.id)"
-          ><v-icon small :color="comment.flagged ? 'red' : 'grey lighten-2'" class="module__trash"
+          @click="$emit('flagComment', questionId, comment._id)"
+          ><v-icon
+            small
+            :color="commentIsFlagged(studentAdkData, comment) ? 'red' : 'grey lighten-2'"
+            class="module__trash"
             >mdi-flag</v-icon
           ></v-btn
         >
@@ -43,6 +49,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from '@vue/composition-api';
+import { ObjectId } from 'bson';
+import { commentIsFlagged, commentIsLiked } from './helpers';
 import { Comment } from '../types';
 
 export default defineComponent({
@@ -50,12 +58,19 @@ export default defineComponent({
   props: {
     questionId: {
       required: true,
-      type: Number
+      type: Object as PropType<ObjectId>
     },
     comment: {
       required: true,
       type: Object as PropType<Comment>
+    },
+    studentAdkData: {
+      required: true,
+      type: Object
     }
+  },
+  setup() {
+    return { commentIsFlagged, commentIsLiked };
   }
 });
 </script>

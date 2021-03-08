@@ -31,6 +31,7 @@
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-link-context": "^1.0.20",
     "apollo-link-http": "^1.5.17",
+    "bson": "^4.2.3",
     "core-js": "^3.6.5",
     "eslint": "^7.11.0",
     "eslint-loader": "^4.0.2",
