@@ -107,15 +107,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  computed,
-  PropType,
-  reactive,
-  toRef,
-  toRefs
-} from '@vue/composition-api';
+import { defineComponent, computed, PropType, reactive, toRefs } from '@vue/composition-api';
 import { getModAdk, getModMongoDoc } from 'pcv4lib/src';
 import { Db, ObjectId } from 'mongodb';
 import { Question as QuestionType, MongoDoc } from '../types';
@@ -184,6 +176,7 @@ export default defineComponent({
       programDoc: null as null | MongoDoc,
       teamDocument: null as null | MongoDoc,
       studentDocument: null as null | MongoDoc,
+      studentAdkData: null as null | Record<string, any>,
       showInstructions: true,
       setupInstructions: {
         description: '',
@@ -199,23 +192,15 @@ export default defineComponent({
 
     const { adkData } = getModAdk(props, ctx.emit, 'forum');
 
-    const defaultStudentAdkData = {
-      bookmarkedQuestions: [],
-      likedQuestions: [],
-      dislikedQuestions: [],
-      flaggedQuestions: [],
-      likedComments: [],
-      flaggedComments: []
-    };
-
     const { adkData: studentAdkData } = getModAdk(
       props,
       ctx.emit,
       'forum',
-      defaultStudentAdkData,
+      {},
       'studentDoc',
       'inputStudentDoc'
     );
+    state.studentAdkData! = studentAdkData.value;
 
     const fetchQuestions = async () => {
       state.questions = await props.db
@@ -235,7 +220,7 @@ export default defineComponent({
       state.questions
         .filter(question => {
           if (state.filter === 'Bookmarks')
-            return questionIsBookmarked(studentAdkData.value, question);
+            return questionIsBookmarked(state.studentAdkData!, question);
           if (state.filter === 'My Questions')
             return question.author === state.studentDocument!.data._id;
           return true;
@@ -255,7 +240,6 @@ export default defineComponent({
     );
 
     const questionsRemaining = computed(() => {
-      console.log(state.teamDocument!);
       const teamQuestions = state.teamDocument!.data.questionsAsked.length;
       return adkData.value.maxQuestions - teamQuestions;
     });
@@ -264,17 +248,17 @@ export default defineComponent({
 
     const likeQuestion = async (_id: ObjectId) => {
       const question = await props.db.collection('Question').findOne({ _id });
-      if (!questionIsLiked(studentAdkData.value, question)) {
-        if (questionIsDisliked(studentAdkData.value, question)) question.dislikes -= 1;
+      if (!questionIsLiked(state.studentAdkData!, question)) {
+        if (questionIsDisliked(state.studentAdkData!, question)) question.dislikes -= 1;
         question.likes += 1;
-        studentAdkData.value.likedQuestions.push(_id.toString()); // question.liked = true
-        studentAdkData.value.dislikedQuestions = removeId(
-          studentAdkData.value.dislikedQuestions,
+        state.studentAdkData!.likedQuestions.push(_id.toString()); // question.liked = true
+        state.studentAdkData!.dislikedQuestions = removeId(
+          state.studentAdkData!.dislikedQuestions,
           _id
         );
       } else {
         question.likes -= 1;
-        studentAdkData.value.likedQuestions = removeId(studentAdkData.value.likedQuestions, _id); // question.liked = false
+        state.studentAdkData!.likedQuestions = removeId(state.studentAdkData!.likedQuestions, _id); // question.liked = false
       }
       props.db
         .collection('Question')
@@ -285,15 +269,15 @@ export default defineComponent({
 
     const dislikeQuestion = async (_id: ObjectId) => {
       const question = await props.db.collection('Question').findOne({ _id });
-      if (!questionIsDisliked(studentAdkData.value, question)) {
-        if (questionIsLiked(studentAdkData.value, question)) question.likes -= 1;
+      if (!questionIsDisliked(state.studentAdkData!, question)) {
+        if (questionIsLiked(state.studentAdkData!, question)) question.likes -= 1;
         question.dislikes += 1;
-        studentAdkData.value.likedQuestions = removeId(studentAdkData.value.likedQuestions, _id);
-        studentAdkData.value.dislikedQuestions.push(_id.toString());
+        state.studentAdkData!.likedQuestions = removeId(state.studentAdkData!.likedQuestions, _id);
+        state.studentAdkData!.dislikedQuestions.push(_id.toString());
       } else {
         question.dislikes -= 1;
-        studentAdkData.value.dislikedQuestions = removeId(
-          studentAdkData.value.dislikedQuestions,
+        state.studentAdkData!.dislikedQuestions = removeId(
+          state.studentAdkData!.dislikedQuestions,
           _id
         );
       }
@@ -305,25 +289,27 @@ export default defineComponent({
     };
 
     const bookmarkQuestion = (_id: ObjectId) => {
-      if (studentAdkData.value.bookmarkedQuestions.some((id: string) => id === _id.toString()))
-        studentAdkData.value.bookmarkedQuestions = removeId(
-          studentAdkData.value.bookmarkedQuestions,
+      if (state.studentAdkData!.bookmarkedQuestions.some((id: string) => id === _id.toString()))
+        state.studentAdkData!.bookmarkedQuestions = removeId(
+          state.studentAdkData!.bookmarkedQuestions,
           _id
         );
-      else studentAdkData.value.bookmarkedQuestions.push(_id.toString());
+      else state.studentAdkData!.bookmarkedQuestions.push(_id.toString());
       state.studentDocument!.update();
     };
 
     const flagQuestion = async (_id: ObjectId) => {
       const question = await props.db.collection('Question').findOne({ _id });
-      if (questionIsFlagged(studentAdkData.value, question)) question.flags -= 1;
-      else question.flags += 1;
-      if (studentAdkData.value.flaggedQuestions.some((id: string) => id === _id.toString()))
-        studentAdkData.value.flaggedQuestions = removeId(
-          studentAdkData.value.flaggedQuestions,
+      if (questionIsFlagged(state.studentAdkData!, question)) {
+        question.flags -= 1;
+        state.studentAdkData!.flaggedQuestions = removeId(
+          state.studentAdkData!.flaggedQuestions,
           _id
         );
-      else studentAdkData.value.flaggedQuestions.push(_id.toString());
+      } else {
+        question.flags += 1;
+        state.studentAdkData!.flaggedQuestions.push(_id.toString());
+      }
       props.db.collection('Question').updateOne({ _id }, { $set: { flags: question.flags } });
       state.studentDocument!.update();
       fetchQuestions();
@@ -336,7 +322,7 @@ export default defineComponent({
       const question = await props.db.collection('Question').findOne({ _id: questionID });
       const commentIndex = getCommentIndex(question, commentID);
       const comment = question.comments[commentIndex];
-      if (commentIsFlagged(studentAdkData.value, comment)) comment.flags -= 1;
+      if (commentIsFlagged(state.studentAdkData!, comment)) comment.flags -= 1;
       else comment.flags += 1;
       props.db
         .collection('Question')
@@ -344,22 +330,21 @@ export default defineComponent({
           { _id: questionID, 'comments._id': commentID },
           { $set: { 'comments.$.flags': comment.flags } }
         );
-      if (studentAdkData.value.flaggedComments.some((id: string) => id === commentID.toString()))
-        studentAdkData.value.flaggedComments = removeId(
-          studentAdkData.value.flaggedComments,
+      if (state.studentAdkData!.flaggedComments.some((id: string) => id === commentID.toString()))
+        state.studentAdkData!.flaggedComments = removeId(
+          state.studentAdkData!.flaggedComments,
           commentID
         );
-      else studentAdkData.value.flaggedComments.push(commentID.toString());
+      else state.studentAdkData!.flaggedComments.push(commentID.toString());
       state.studentDocument!.update();
       fetchQuestions();
     };
 
     const likeComment = async (questionID: ObjectId, commentID: ObjectId) => {
-      console.log(questionID, commentID);
       const question = await props.db.collection('Question').findOne({ _id: questionID });
       const commentIndex = getCommentIndex(question, commentID);
       const comment = question.comments[commentIndex];
-      if (!commentIsLiked(studentAdkData.value, comment)) comment.likes += 1;
+      if (!commentIsLiked(state.studentAdkData!, comment)) comment.likes += 1;
       else comment.likes -= 1;
       props.db
         .collection('Question')
@@ -367,13 +352,12 @@ export default defineComponent({
           { _id: questionID, 'comments._id': commentID },
           { $set: { 'comments.$.likes': comment.likes } }
         );
-      if (studentAdkData.value.likedComments.some((id: string) => id === commentID.toString()))
-        studentAdkData.value.likedComments = removeId(
-          studentAdkData.value.likedComments,
+      if (state.studentAdkData!.likedComments.some((id: string) => id === commentID.toString()))
+        state.studentAdkData!.likedComments = removeId(
+          state.studentAdkData!.likedComments,
           commentID
         );
-      else studentAdkData.value.likedComments.push(commentID.toString());
-      console.log(studentAdkData.value);
+      else state.studentAdkData!.likedComments.push(commentID.toString());
       state.studentDocument!.update();
       fetchQuestions();
     };

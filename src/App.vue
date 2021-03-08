@@ -78,7 +78,6 @@ export default defineComponent({
           },
           updateOne({ _id }, query) {
             return new Promise((resolve, reject) => {
-              console.log(_id);
               const question = questions.value.filter(obj => obj._id.equals(_id))[0];
               // update
               if (query.$push) question.comments.push(query.$push.comments);

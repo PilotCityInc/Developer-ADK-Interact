@@ -64,15 +64,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType, computed } from '@vue/composition-api';
+import { defineComponent, ref, PropType } from '@vue/composition-api';
 import CommentSection from './CommentSection.vue';
 import { Question } from '../types';
 import {
   questionIsBookmarked,
   questionIsDisliked,
   questionIsLiked,
-  questionIsFlagged,
-  removeId
+  questionIsFlagged
 } from './helpers';
 
 export default defineComponent({

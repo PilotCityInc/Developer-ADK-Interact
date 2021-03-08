@@ -311,10 +311,24 @@ export default defineComponent({
       maxQuestions: 2
     };
     getModAdk(props, ctx.emit, 'forum', defaultForumProps);
+
     const defaultTeamData = {
       questionsAsked: []
     };
-    getModMongoDoc(props, ctx.emit, defaultTeamData, 'teamDoc', 'inputTeamDoc');
+    if (props.teamDoc) getModMongoDoc(props, ctx.emit, defaultTeamData, 'teamDoc', 'inputTeamDoc');
+
+    const defaultStudentAdkData = {
+      bookmarkedQuestions: [],
+      likedQuestions: [],
+      dislikedQuestions: [],
+      flaggedQuestions: [],
+      likedComments: [],
+      flaggedComments: []
+    };
+
+    if (props.studentDoc)
+      getModAdk(props, ctx.emit, 'forum', defaultStudentAdkData, 'studentDoc', 'inputStudentDoc');
+
     const programDoc = getModMongoDoc(props, ctx.emit);
 
     const moduleName = ref('Forum');
