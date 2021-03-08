@@ -388,7 +388,6 @@ export default defineComponent({
     };
 
     return {
-      studentAdkData,
       questionsRemaining,
       ...toRefs(state),
       scrollUp,
