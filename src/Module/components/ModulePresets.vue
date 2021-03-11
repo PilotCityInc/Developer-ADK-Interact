@@ -122,6 +122,16 @@ export default {
       ]
     });
 
+    // const initInteractPresets = {
+    //   defaultActivity: {
+    //     group: 'Project',
+    //     requiredActivity: 'No',
+    //     deliverableActivity: 'No',
+    //     endEarlyActivity: 'No',
+    //     required: false
+    //   }
+    // };
+
     const setupInstructions = ref({
       description: '',
       instructions: ['', '', '']

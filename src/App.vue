@@ -2,6 +2,7 @@
   <v-app>
     <Module
       v-model="programDocStub"
+      :user-type="userTypeStub"
       :db="db"
       :team-doc="teamDoc"
       :student-doc="studentDoc"
@@ -163,8 +164,11 @@ export default defineComponent({
       },
       changeStream: {}
     });
+    const userTypeStub = 'participant';
+
     return {
       programDocStub,
+      userTypeStub,
       studentDoc,
       teamDoc,
       db
