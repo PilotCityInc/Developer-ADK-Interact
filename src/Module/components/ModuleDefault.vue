@@ -54,7 +54,7 @@
           :placeholder="`You have ${questionsRemaining} questions remaining`"
         >
         </v-text-field>
-        <v-btn color="#f79961" rounded dark depressed x-large @click="postQuestion"
+        <v-btn color="#ea6764" rounded dark depressed x-large @click="postQuestion"
           >Ask Question</v-btn
         >
       </div>
@@ -63,7 +63,7 @@
           v-for="option in filterOptions"
           :key="option.label"
           class="mr-1 ml-2"
-          :color="filter === option.label ? '#f79961' : 'grey'"
+          :color="filter === option.label ? '#ea6764' : 'grey'"
           :dark="filter === option.label ? true : null"
           :outlined="filter === option.label ? false : true"
           depressed
