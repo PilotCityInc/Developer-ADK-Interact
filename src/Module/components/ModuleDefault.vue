@@ -107,7 +107,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, reactive, toRefs } from '@vue/composition-api';
+import {
+  defineComponent,
+  computed,
+  PropType,
+  reactive,
+  toRefs,
+  WritableComputedRef
+} from '@vue/composition-api';
 import { getModAdk, getModMongoDoc } from 'pcv4lib/src';
 import { Db, ObjectId } from 'mongodb';
 import { Question as QuestionType, MongoDoc } from '../types';
@@ -173,9 +180,13 @@ export default defineComponent({
       filter: 'All',
       questionInput: '',
       questions: [] as QuestionType[],
-      programDoc: null as null | MongoDoc,
-      teamDocument: null as null | MongoDoc,
-      studentDocument: null as null | MongoDoc,
+      programDoc: getModMongoDoc(props, ctx.emit),
+      teamDocument: props.teamDoc
+        ? getModMongoDoc(props, ctx.emit, {}, 'teamDoc', 'inputTeamDoc')
+        : null,
+      studentDocument: props.studentDoc
+        ? getModMongoDoc(props, ctx.emit, {}, 'studentDoc', 'inputStudentDoc')
+        : null,
       studentAdkData: null as null | Record<string, any>,
       showInstructions: true,
       setupInstructions: {
@@ -183,12 +194,6 @@ export default defineComponent({
         instructions: ['', '', '']
       }
     });
-
-    state.programDoc = getModMongoDoc(props, ctx.emit);
-    if (props.teamDoc)
-      state.teamDocument = getModMongoDoc(props, ctx.emit, {}, 'teamDoc', 'inputTeamDoc');
-    if (props.studentDoc)
-      state.studentDocument = getModMongoDoc(props, ctx.emit, {}, 'studentDoc', 'inputStudentDoc');
 
     const { adkData } = getModAdk(props, ctx.emit, 'forum');
 
@@ -240,7 +245,8 @@ export default defineComponent({
     );
 
     const questionsRemaining = computed(() => {
-      const teamQuestions = state.teamDocument!.data.questionsAsked.length;
+      state.teamDocument!.data.questionsAsked = state.teamDocument!.data.questionsAsked ?? [];
+      const teamQuestions = state.teamDocument!.data.questionsAsked.length; /// !HERE
       return adkData.value.maxQuestions - teamQuestions;
     });
 

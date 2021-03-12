@@ -19,7 +19,9 @@ export interface Comment {
 }
 
 export interface MongoDoc {
-  data: Record<string, any>;
+  data: {
+    [x: string]: any;
+  };
   update: () => Promise<any>;
   changeStream: any;
 }
