@@ -168,6 +168,11 @@ export default defineComponent({
       type: Object as PropType<MongoDoc>,
       default: () => {}
     },
+    userDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc>,
+      default: () => {}
+    },
     db: {
       required: false,
       type: Object as PropType<Db>,
@@ -226,8 +231,7 @@ export default defineComponent({
         .filter(question => {
           if (state.filter === 'Bookmarks')
             return questionIsBookmarked(state.studentAdkData!, question);
-          if (state.filter === 'My Questions')
-            return question.author === state.studentDocument!.data._id;
+          if (state.filter === 'My Questions') return question.author === props.userDoc?.data._id;
           return true;
         })
         .reverse()
@@ -371,7 +375,7 @@ export default defineComponent({
     const postQuestion = async () => {
       if (state.questionInput.length > 0) {
         const question = {
-          author: state.studentDocument!.data._id,
+          author: props.userDoc?.data._id,
           text: state.questionInput,
           comments: [],
           likes: 0,

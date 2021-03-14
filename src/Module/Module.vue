@@ -111,6 +111,7 @@
               :db="db"
               :team-doc="teamDoc"
               :student-doc="studentDoc"
+              :user-doc="userDoc"
               @inputTeamDoc="$emit('inputTeamDoc', $event)"
               @inputStudentDoc="$emit('inputStudentDoc', $event)"
             />
@@ -304,6 +305,11 @@ export default defineComponent({
       default: () => {}
     },
     studentDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc | null>,
+      default: () => {}
+    },
+    userDoc: {
       required: false,
       type: Object as PropType<MongoDoc | null>,
       default: () => {}

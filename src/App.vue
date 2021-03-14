@@ -6,6 +6,7 @@
       :db="db"
       :team-doc="teamDoc"
       :student-doc="studentDoc"
+      :user-doc="userDoc"
       @inputTeamDoc="teamDoc = $event"
       @inputStudentDoc="studentDoc = $event"
     />
@@ -148,8 +149,6 @@ export default defineComponent({
 
     const studentDoc: Ref<MongoDoc> = ref({
       data: {
-        firstName: 'me',
-        lastName: 'test',
         _id: new ObjectId(1),
         team: teamID,
         adks: []
@@ -164,12 +163,20 @@ export default defineComponent({
       },
       changeStream: {}
     });
+    const userDoc: Ref<MongoDoc> = ref({
+      data: {
+        firstName: 'me',
+        lastName: 'test',
+        _id: new ObjectId(2)
+      },
+      changeStream: {}
+    });
     const userTypeStub = 'participant';
-
     return {
       programDocStub,
       userTypeStub,
       studentDoc,
+      userDoc,
       teamDoc,
       db
     };
