@@ -42,7 +42,7 @@
       buffer-value="100"
       stream
     />
-    <div class="module-edit__container">
+    <div class="module-edit__container mt-12">
       <!-- ENTER CONTENT HERE -->
       <div class="module-default__row">
         <v-text-field
@@ -551,7 +551,7 @@ export default defineComponent({
 
   &__collapse-divider {
     margin-top: 15px;
-    margin-bottom: 75px;
+    // margin-bottom: 75px;
     margin-right: none;
     margin-left: none;
     padding-right: none;
