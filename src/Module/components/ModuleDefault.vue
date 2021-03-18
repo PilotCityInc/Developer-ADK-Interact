@@ -495,15 +495,15 @@ export default defineComponent({
 }
 
 .v-application--is-ltr .v-timeline--dense:not(.v-timeline--reverse):before {
-  left: calc(18px - 1px) !important;
+  // left: calc(18px - 1px) !important;
 }
 
 .v-timeline-item__divider {
-  min-width: 38px !important;
+  // min-width: 38px !important;
 }
 
 .v-timeline-item__body {
-  max-width: 100% !important;
+  // max-width: 100% !important;
 }
 
 // .v-timeline--dense .v-timeline-item__body {
