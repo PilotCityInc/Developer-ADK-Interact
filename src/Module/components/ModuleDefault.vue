@@ -34,7 +34,14 @@
       </v-expansion-panels>
     </div>
 
-    <v-progress-linear class="mt-3" color="#dedede" height="2" value="100" buffer-value="100" stream />
+    <v-progress-linear
+      class="mt-3"
+      color="#dedede"
+      height="2"
+      value="100"
+      buffer-value="100"
+      stream
+    />
     <div class="module-edit__container mt-12">
       <!-- ENTER CONTENT HERE -->
       <div class="module-default__row">
@@ -195,15 +202,18 @@ export default defineComponent({
 
     const { adkData } = getModAdk(props, ctx.emit, 'forum');
 
-    const { adkData: studentAdkData } = getModAdk(
-      props,
-      ctx.emit,
-      'forum',
-      {},
-      'studentDoc',
-      'inputStudentDoc'
-    );
-    state.studentAdkData! = studentAdkData.value;
+    if (props.studentDoc) {
+      const { adkData: studentAdkData } = getModAdk(
+        props,
+        ctx.emit,
+        'forum',
+        {},
+        'studentDoc',
+        'inputStudentDoc'
+      );
+      state.studentAdkData = studentAdkData.value;
+    }
+    // state.studentAdkData! = studentAdkData.value;
 
     const fetchQuestions = async () => {
       state.questions = await props.db

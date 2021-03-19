@@ -322,7 +322,9 @@ export default defineComponent({
     const defaultForumProps = {
       maxQuestions: 2
     };
-    getModAdk(props, ctx.emit, 'forum', defaultForumProps);
+    if (props.value) {
+      getModAdk(props, ctx.emit, 'forum', defaultForumProps);
+    }
 
     const defaultTeamData = {
       questionsAsked: []
