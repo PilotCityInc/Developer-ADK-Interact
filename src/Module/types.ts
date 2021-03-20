@@ -22,6 +22,6 @@ export interface MongoDoc {
   data: {
     [x: string]: any;
   };
-  update: () => Promise<any>;
+  update: (shouldMarkAsComplete?:any) => Promise<any>;
   changeStream: any;
 }

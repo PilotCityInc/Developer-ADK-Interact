@@ -200,7 +200,7 @@ export default defineComponent({
       }
     });
 
-    const { adkData } = getModAdk(props, ctx.emit, 'forum');
+    const { adkData, adkIndex } = getModAdk(props, ctx.emit, 'forum');
 
     if (props.studentDoc) {
       const { adkData: studentAdkData } = getModAdk(
@@ -254,7 +254,15 @@ export default defineComponent({
     const questionsRemaining = computed(() => {
       state.teamDocument!.data.questionsAsked = state.teamDocument!.data.questionsAsked ?? [];
       const teamQuestions = state.teamDocument!.data.questionsAsked.length; /// !HERE
-      return adkData.value.maxQuestions - teamQuestions;
+      const ret = adkData.value.maxQuestions - teamQuestions;
+      if (ret <= 0) {
+        // When the user has asked enough questions, we will unlock the next module.
+        adkData.value.update(() => ({
+          isComplete: true,
+          adkIndex: adkIndex
+        }))
+      }
+      return ret;
     });
 
     // Question and Comments Actions
