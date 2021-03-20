@@ -79,7 +79,7 @@
         >
       </div>
       <div>
-        <div v-if="timeline.length > 0">
+        <div v-if="timeline.length > 0 && studentDoc">
           <Question
             v-for="question in timeline"
             :key="question._id.toString()"
@@ -107,14 +107,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  computed,
-  PropType,
-  reactive,
-  toRefs,
-  WritableComputedRef
-} from '@vue/composition-api';
+import { defineComponent, computed, PropType, reactive, toRefs } from '@vue/composition-api';
 import { getModAdk, getModMongoDoc } from 'pcv4lib/src';
 import { Db, ObjectId } from 'mongodb';
 import { Question as QuestionType, MongoDoc } from '../types';
@@ -207,7 +200,7 @@ export default defineComponent({
         props,
         ctx.emit,
         'forum',
-        {},
+        { isComplete: false },
         'studentDoc',
         'inputStudentDoc'
       );
@@ -252,15 +245,12 @@ export default defineComponent({
     );
 
     const questionsRemaining = computed(() => {
-      state.teamDocument!.data.questionsAsked = state.teamDocument!.data.questionsAsked ?? [];
-      const teamQuestions = state.teamDocument!.data.questionsAsked.length; /// !HERE
-      const ret = adkData.value.maxQuestions - teamQuestions;
+      const teamQuestions = state.teamDocument ? state.teamDocument!.data.questionsAsked : [];
+      const ret = adkData.value.maxQuestions - teamQuestions.length;
       if (ret <= 0) {
         // When the user has asked enough questions, we will unlock the next module.
-        adkData.value.update(() => ({
-          isComplete: true,
-          adkIndex: adkIndex
-        }))
+        state.studentAdkData!.isComplete = true;
+        props.studentDoc.update();
       }
       return ret;
     });
