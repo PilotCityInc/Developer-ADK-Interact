@@ -13,6 +13,7 @@
           >
 
           <v-btn
+            :disabled="userType === 'stakeholder'"
             class="ml-2 mr-1"
             small
             depressed
@@ -28,6 +29,7 @@
             {{ question.likes }}
           </v-btn>
           <v-btn
+            :disabled="userType === 'stakeholder'"
             class="ml-2 mr-1"
             small
             depressed
@@ -49,7 +51,7 @@
               >mdi-flag</v-icon
             >
           </v-btn>
-          <v-btn class="ml-6 mr-3" small icon @click="$emit('bookmarkQuestion', question._id)"
+          <v-btn :disabled="userType === 'stakeholder'" class="ml-6 mr-3" small icon @click="$emit('bookmarkQuestion', question._id)"
             ><v-icon
               small
               :color="questionIsBookmarked(studentAdkData, question) ? 'black' : 'grey lighten-2'"

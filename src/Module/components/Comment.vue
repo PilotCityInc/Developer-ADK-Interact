@@ -18,11 +18,13 @@
 												> -->
 
         <v-btn
+          :disabled="userType === 'stakeholder'"
           class="module__trash"
           small
           icon
           @click="$emit('likeComment', questionId, comment._id)"
           ><v-icon
+            :disabled="userType === 'stakeholder'"
             class="module__trash"
             small
             :color="commentIsLiked(studentAdkData, comment) ? 'red' : 'grey'"

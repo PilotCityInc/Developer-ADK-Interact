@@ -9,6 +9,7 @@
           /></v-avatar>
         </template>
         <v-text-field
+          :disabled="userType === 'stakeholder'"
           v-model="commentInput"
           class="module-default__answer-text"
           hide-details
@@ -18,7 +19,7 @@
           @keydown.enter="comment"
         >
           <template v-slot:append>
-            <v-btn small class="mx-0" outlined depressed @click="comment">Post</v-btn>
+            <v-btn :disabled="userType === 'stakeholder'" small class="mx-0" outlined depressed @click="comment">Post</v-btn>
           </template>
         </v-text-field>
       </v-timeline-item>

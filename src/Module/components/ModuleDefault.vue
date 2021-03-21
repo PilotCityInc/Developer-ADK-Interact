@@ -50,11 +50,11 @@
           rounded
           class="mr-4"
           outlined
-          :disabled="questionsRemaining <= 0"
+          :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
           :placeholder="`You have ${questionsRemaining} questions remaining`"
         >
         </v-text-field>
-        <v-btn color="#ea6764" rounded dark depressed x-large @click="postQuestion"
+        <v-btn :disabled="userType === 'stakeholder'" color="#ea6764" rounded dark depressed x-large @click="postQuestion"
           >Ask Question</v-btn
         >
       </div>
