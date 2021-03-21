@@ -171,13 +171,13 @@ export default defineComponent({
       },
       changeStream: {}
     });
-    const userTypeStub = 'participant';
+    const userTypeStub = 'organizer';
     return {
       programDocStub,
       userTypeStub,
-      studentDoc,
+      studentDoc: null,
       userDoc,
-      teamDoc,
+      teamDoc: null,
       db
     };
   }

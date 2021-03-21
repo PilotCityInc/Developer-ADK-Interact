@@ -52,11 +52,7 @@
 
             <v-tooltip right>
               <template #activator="{ on, attrs }">
-                <a
-                  href="https://discord.gg/JaWg85zE"
-                  target="_blank"
-                  style="text-decoration: none"
-                >
+                <a href="https://discord.gg/JaWg85zE" target="_blank" style="text-decoration: none">
                   <v-btn v-bind="attrs" icon v-on="on"
                     ><v-icon color="grey darken-2">mdi-face-agent</v-icon></v-btn
                   ></a

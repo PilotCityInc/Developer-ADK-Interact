@@ -79,7 +79,7 @@
         >
       </div>
       <div>
-        <div v-if="timeline.length > 0">
+        <div v-if="timeline.length > 0 && studentDoc">
           <Question
             v-for="question in timeline"
             :key="question._id.toString()"
@@ -107,14 +107,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  computed,
-  PropType,
-  reactive,
-  toRefs,
-  WritableComputedRef
-} from '@vue/composition-api';
+import { defineComponent, computed, PropType, reactive, toRefs } from '@vue/composition-api';
 import { getModAdk, getModMongoDoc } from 'pcv4lib/src';
 import { Db, ObjectId } from 'mongodb';
 import { Question as QuestionType, MongoDoc } from '../types';
@@ -193,6 +186,7 @@ export default defineComponent({
         ? getModMongoDoc(props, ctx.emit, {}, 'studentDoc', 'inputStudentDoc')
         : null,
       studentAdkData: null as null | Record<string, any>,
+      teamAdkData: null as null | Record<string, any>,
       showInstructions: true,
       setupInstructions: {
         description: '',
@@ -215,11 +209,22 @@ export default defineComponent({
     }
     // state.studentAdkData! = studentAdkData.value;
 
+    if (props.teamDoc) {
+      const { adkData: teamAdkData } = getModAdk(
+        props,
+        ctx.emit,
+        'forum',
+        {},
+        'teamDoc',
+        'inputTeamDoc'
+      );
+      state.teamAdkData = teamAdkData.value;
+    }
+
     const fetchQuestions = async () => {
       state.questions = await props.db
         .collection('Question')
-        .find({ programId: props.value!.data._id })
-        .toArray();
+        .find({ programId: props.value!.data._id });
     };
     fetchQuestions();
 
@@ -252,15 +257,14 @@ export default defineComponent({
     );
 
     const questionsRemaining = computed(() => {
-      state.teamDocument!.data.questionsAsked = state.teamDocument!.data.questionsAsked ?? [];
-      const teamQuestions = state.teamDocument!.data.questionsAsked.length; /// !HERE
-      const ret = adkData.value.maxQuestions - teamQuestions;
+      const teamQuestions = state.teamAdkData ? state.teamAdkData.questionsAsked : [];
+      const ret = adkData.value.maxQuestions - teamQuestions.length;
       if (ret <= 0) {
         // When the user has asked enough questions, we will unlock the next module.
         adkData.value.update(() => ({
           isComplete: true,
-          adkIndex: adkIndex
-        }))
+          adkIndex
+        }));
       }
       return ret;
     });
@@ -387,6 +391,7 @@ export default defineComponent({
       if (state.questionInput.length > 0) {
         const question = {
           author: props.userDoc?.data._id,
+          programId: props.value!.data._id,
           text: state.questionInput,
           comments: [],
           likes: 0,
@@ -395,14 +400,14 @@ export default defineComponent({
         };
         const { insertedId } = await props.db.collection('Question').insertOne(question);
         fetchQuestions();
-        state.teamDocument!.data.questionsAsked.push(insertedId);
+        state.teamAdkData!.questionsAsked.push(insertedId);
         state.teamDocument!.update();
         state.questionInput = '';
       }
     };
 
-    const postComment = (questionID: ObjectId, comment: Record<string, any>) => {
-      props.db
+    const postComment = async (questionID: ObjectId, comment: Record<string, any>) => {
+      await props.db
         .collection('Question')
         .updateOne({ _id: questionID }, { $push: { comments: comment } });
       fetchQuestions();
