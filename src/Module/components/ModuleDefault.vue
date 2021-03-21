@@ -42,13 +42,13 @@
       buffer-value="100"
       stream
     />
-    <div class="d-flex flex-column pa-5 mt-12">
+    <div class="forum__question justify-center d-flex flex-column pa-5 mt-12">
       <!-- ENTER CONTENT HERE -->
       <div class="module-default__row">
         <v-text-field
           v-model="questionInput"
           rounded
-          class="mr-4"
+          class="mr-4 forum__question"
           outlined
           :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
           :placeholder="`You have ${questionsRemaining} questions remaining`"
@@ -65,7 +65,7 @@
           >Ask Question</v-btn
         >
       </div>
-      <div class="module-default__row">
+      <div class="module-default__row justify-center">
         <v-btn
           v-for="option in filterOptions"
           :key="option.label"
@@ -551,7 +551,9 @@ export default defineComponent({
 // .v-timeline--dense .v-timeline-item__body {
 //   max-width: 100% !important;
 // }
-
+.forum__question {
+  width: 100%;
+}
 .module-default {
   &__answer-text {
     font-family: Raleway;

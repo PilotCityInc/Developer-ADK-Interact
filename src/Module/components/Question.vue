@@ -87,6 +87,13 @@ export default defineComponent({
     studentAdkData: {
       required: true,
       type: Object
+    },
+    userType: {
+      required: true,
+      type: String
+      // participant: '',
+      // organizer: '',
+      // stakeholder: ''
     }
   },
   setup(props) {
