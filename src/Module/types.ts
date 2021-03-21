@@ -2,7 +2,7 @@ import { ObjectId } from 'bson';
 
 export interface Question {
   _id: ObjectId;
-  author: number;
+  author: ObjectId;
   text: string;
   comments: Comment[];
   likes: number;
@@ -22,6 +22,6 @@ export interface MongoDoc {
   data: {
     [x: string]: any;
   };
-  update: (shouldMarkAsComplete?:any) => Promise<any>;
+  update: (shouldMarkAsComplete?: any) => Promise<any>;
   changeStream: any;
 }

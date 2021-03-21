@@ -9,8 +9,8 @@
           /></v-avatar>
         </template>
         <v-text-field
-          :disabled="userType === 'stakeholder'"
           v-model="commentInput"
+          :disabled="userType === 'stakeholder'"
           class="module-default__answer-text"
           hide-details
           flat
@@ -19,7 +19,15 @@
           @keydown.enter="comment"
         >
           <template v-slot:append>
-            <v-btn :disabled="userType === 'stakeholder'" small class="mx-0" outlined depressed @click="comment">Post</v-btn>
+            <v-btn
+              :disabled="userType === 'stakeholder'"
+              small
+              class="mx-0"
+              outlined
+              depressed
+              @click="comment"
+              >Post</v-btn
+            >
           </template>
         </v-text-field>
       </v-timeline-item>
@@ -63,9 +71,11 @@ export default defineComponent({
     const commentInput = ref('');
     const numComments = ref(5);
 
-    const visibleComments = computed(() =>
-      props.question.comments.slice().reverse().slice(0, numComments.value)
-    );
+    const visibleComments = computed(() => {
+      const comments = props.question.comments.slice();
+      comments.sort((a, b) => b.likes - a.likes);
+      return comments.slice(0, numComments.value);
+    });
 
     const comment = () => {
       if (commentInput.value.length > 0) {
