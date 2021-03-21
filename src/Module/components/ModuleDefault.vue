@@ -42,7 +42,7 @@
       buffer-value="100"
       stream
     />
-    <div class="d-flex justify-center pa-5 mt-12">
+    <div class="d-flex flex-column pa-5 mt-12">
       <!-- ENTER CONTENT HERE -->
       <div class="module-default__row">
         <v-text-field
