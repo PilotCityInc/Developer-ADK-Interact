@@ -329,7 +329,8 @@ export default defineComponent({
     const defaultTeamData = {
       questionsAsked: []
     };
-    if (props.teamDoc) getModMongoDoc(props, ctx.emit, defaultTeamData, 'teamDoc', 'inputTeamDoc');
+    if (props.teamDoc)
+      getModAdk(props, ctx.emit, 'forum', defaultTeamData, 'teamDoc', 'inputTeamDoc');
 
     const defaultStudentAdkData = {
       bookmarkedQuestions: [],
