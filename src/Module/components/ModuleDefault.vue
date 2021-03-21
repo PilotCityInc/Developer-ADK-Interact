@@ -42,7 +42,7 @@
       buffer-value="100"
       stream
     />
-    <div class="module-edit__container mt-12">
+    <div class="d-flex justify-center pa-5 mt-12">
       <!-- ENTER CONTENT HERE -->
       <div class="module-default__row">
         <v-text-field
@@ -566,6 +566,7 @@ export default defineComponent({
   }
   &__row {
     display: flex;
+    width: 100%;
     flex-direction: row;
     // text-align: center;
     justify-content: center;
