@@ -49,7 +49,7 @@
           <v-text-field
             v-model="questionInput"
             rounded
-            class="mr-4 forum__question"
+            class="module-default__text-field"
             outlined
             :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
             :placeholder="`You have ${questionsRemaining} questions remaining`"
@@ -62,6 +62,7 @@
             color="#ea6764"
             rounded
             dark
+            class="module-default__log-btn"
             depressed
             x-large
             @click="postQuestion"
