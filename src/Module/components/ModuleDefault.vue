@@ -44,48 +44,54 @@
     />
     <div class="forum__question justify-center d-flex flex-column pa-5 mt-12">
       <!-- ENTER CONTENT HERE -->
-      <div class="module-default__row">
-        <v-text-field
-          v-model="questionInput"
-          rounded
-          class="mr-4 forum__question"
-          outlined
-          :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
-          :placeholder="`You have ${questionsRemaining} questions remaining`"
-        >
-        </v-text-field>
-        <v-btn
-          :disabled="userType === 'stakeholder'"
-          color="#ea6764"
-          rounded
-          dark
-          depressed
-          x-large
-          @click="postQuestion"
-          >Ask Question</v-btn
-        >
+      <div class="d-flex flex-row mb-8">
+        <div>
+          <v-text-field
+            v-model="questionInput"
+            rounded
+            class="mr-4 forum__question"
+            outlined
+            :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
+            :placeholder="`You have ${questionsRemaining} questions remaining`"
+          >
+          </v-text-field>
+        </div>
+        <div>
+          <v-btn
+            :disabled="userType === 'stakeholder'"
+            color="#ea6764"
+            rounded
+            dark
+            depressed
+            x-large
+            @click="postQuestion"
+            >Ask Question</v-btn
+          >
+        </div>
       </div>
-      <div class="module-default__row justify-center">
-        <v-btn
-          v-for="option in filterOptions"
-          :key="option.label"
-          class="mr-1 ml-2"
-          :color="filter === option.label ? '#ea6764' : 'grey'"
-          :dark="filter === option.label ? true : null"
-          :outlined="filter === option.label ? false : true"
-          depressed
-          small
-          @click="
-            filter = option.label;
-            page = 1;
-          "
-          ><v-icon :color="filter === option.label ? 'white' : 'grey lighten-1'" left>{{
-            `mdi-${option.icon}`
-          }}</v-icon
-          >{{ option.label }}</v-btn
-        >
+      <div class="d-flex flex-row justify-center">
+        <div>
+          <v-btn
+            v-for="option in filterOptions"
+            :key="option.label"
+            class="mr-1 ml-2"
+            :color="filter === option.label ? '#ea6764' : 'grey'"
+            :dark="filter === option.label ? true : null"
+            :outlined="filter === option.label ? false : true"
+            depressed
+            small
+            @click="
+              filter = option.label;
+              page = 1;
+            "
+            ><v-icon :color="filter === option.label ? 'white' : 'grey lighten-1'" left>{{
+              `mdi-${option.icon}`
+            }}</v-icon
+            >{{ option.label }}</v-btn
+          >
+        </div>
       </div>
-      <div>
+      <div class="justify-center">
         <div v-if="timeline.length > 0 && studentDoc">
           <Question
             v-for="question in timeline"
