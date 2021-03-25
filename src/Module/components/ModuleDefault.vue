@@ -44,7 +44,7 @@
     />
     <div class="forum__question justify-center d-flex flex-column pa-5 mt-12">
       <!-- ENTER CONTENT HERE -->
-      <div class="d-flex flex-row mb-8">
+      <div class="d-flex flex-row justify-center mb-8">
         <div>
           <v-text-field
             v-model="questionInput"
