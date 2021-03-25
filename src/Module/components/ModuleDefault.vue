@@ -244,12 +244,12 @@ export default defineComponent({
     const fetchQuestions = async () => {
       const questions = await props.db
         .collection('Question')
-        .find({ programId: props.value!.data._id });
+        .find({ program_id: props.value!.data._id });
       // ignore these warnings, the main repo returns an array instead of a Cursor
       questions.sort((a: QuestionType, b: QuestionType) => (a.likes > b.likes ? 1 : -1));
       state.questions = questions;
       // ! can't figure this out
-      // .aggregate([{$search: {equals: {path: 'programId', value: props.value!.data._id }}}, {$sort: {likes: -1}}])
+      // .aggregate([{$search: {equals: {path: 'program_id', value: props.value!.data._id }}}, {$sort: {likes: -1}}])
     };
     fetchQuestions();
 
@@ -417,7 +417,7 @@ export default defineComponent({
       if (state.questionInput.length > 0) {
         const question = {
           author: props.userDoc?.data._id,
-          programId: props.value!.data._id,
+          program_id: props.value!.data._id,
           text: state.questionInput,
           comments: [],
           likes: 0,
