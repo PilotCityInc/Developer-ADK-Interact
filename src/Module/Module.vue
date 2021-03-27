@@ -2,7 +2,7 @@
   <!--  TODO: make the inputs into actual components -->
   <v-container class="module">
     <div class="module__navbar">
-      <v-btn
+      <!-- <v-btn
         v-if="currentPage == 'preview'"
         dark
         class="module__navbar-button"
@@ -11,29 +11,33 @@
         color="grey lighten-1"
         rounded
         >00:00:00</v-btn
-      >
+      > -->
       <v-btn
-        v-if="currentPage != 'preview'"
+        v-if="currentPage != 'preview' && userType === 'organizer'"
         class="module__navbar-button"
         outlined
-        x-small
+        small
+        rounded
         depressed
         @click="currentPage = 'preview'"
         >Preview</v-btn
       >
 
       <v-btn
-        v-if="currentPage == 'preview'"
+        v-if="currentPage == 'preview' && userType === 'organizer'"
         class="module__navbar-button"
         dark
-        x-small
+        small
+        rounded
         depressed
         color="red"
         @click="currentPage = 'setup'"
         >Exit Preview</v-btn
       >
 
-      <v-menu v-if="currentPage != 'preview'" offset-y left>
+      <!-- COMMENT OUT UNTIL VERSION WHERE CUSTOMIZABILITY IS ALLOWED -->
+
+      <!-- <v-menu v-if="currentPage != 'preview'" offset-y left>
         <template v-slot:activator="{ on, attrs }">
           <v-btn v-bind="attrs" small icon class="module__navbar-button" v-on="on">
             <v-icon color="grey lighten-1">mdi-cog</v-icon></v-btn
@@ -60,20 +64,15 @@
             swatches-max-height="100"
           ></v-color-picker>
         </v-card>
-      </v-menu>
+      </v-menu> -->
     </div>
     <div class="module__container" :style="{ 'border-color': getColor }">
       <div class="module__title">
         <div class="module__image rounded-circle">
-          <v-icon light x-large :color="selectedColor">
-            mdi-account-supervisor-circle-outline
-          </v-icon>
+          <v-icon light x-large :color="selectedColor">mdi-comment-text-multiple-outline</v-icon>
         </div>
         <div class="module__header text-md-h5 text-sm-subtitle-1 d-flex align-center">
-          <input :value="moduleName" type="text" class="module__header-text" />
-          <v-chip-group class="module__header-chips"
-            ><v-chip disabled dark small>Preset Tags</v-chip>
-          </v-chip-group>
+          <input disabled :value="moduleName" type="text" class="module__header-text mb-5" />
         </div>
       </div>
       <div class="module__body">
@@ -86,7 +85,7 @@
           stream
         />
         <div v-if="currentPage != 'preview'" class="module__pagination">
-          <div v-for="page in subpages" :key="page" :class="{ active: currentPage == page }">
+          <div v-for="page in subpages" :key="page" :class="{ active: currentPage === page }">
             <div class="module__pagination-button--active" />
             <v-btn
               :ripple="false"
@@ -103,14 +102,24 @@
         </div>
         <div class="module__page">
           <keep-alive>
-            <component :is="getComponent" />
+            <component
+              :is="getComponent"
+              v-model="programDoc"
+              :db="db"
+              :team-doc="teamDoc"
+              :student-doc="studentDoc"
+              :user-doc="userDoc"
+              :user-type="userType"
+              @inputTeamDoc="$emit('inputTeamDoc', $event)"
+              @inputStudentDoc="$emit('inputStudentDoc', $event)"
+            />
           </keep-alive>
         </div>
       </div>
     </div>
     <!-- TIMELINE START -->
 
-    <template>
+    <!-- <template>
       <v-container v-if="currentPage == 'preview'" style="max-width: 675px">
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
@@ -201,13 +210,11 @@
                 <v-col cols="7" v-text="event.text"></v-col>
                 <v-col class="text-right" cols="3" v-text="event.time"></v-col>
                 <v-col class="text-right" cols="2">
-                  <!-- POSTER, STUDENT PARTICIPANT OR ORGANIZER CAN DELETE POSTS -->
                   <v-btn small class="module__trash" icon
                     ><v-icon small color="grey" class="module__trash"
                       >mdi-trash-can-outline</v-icon
                     ></v-btn
                   >
-                  <!-- ANYONE CAN FLAG COMMENTS -->
                   <v-btn small class="module__trash" icon
                     ><v-icon small color="grey" class="module__trash">mdi-flag</v-icon></v-btn
                   ></v-col
@@ -217,15 +224,11 @@
               <v-btn class="" icon><v-icon color="grey lighten-2">mdi-thumb-up</v-icon></v-btn>
 
               <v-btn class="" icon><v-icon color="grey lighten-2">mdi-thumb-down</v-icon></v-btn>
-              <!--
-              <v-btn x-small outlined depressed class="mx-0">Reply</v-btn>
-
-              <v-btn small class="" icon><v-icon color="grey lighten-2">mdi-flag</v-icon></v-btn> -->
             </v-timeline-item>
           </v-slide-x-transition>
         </v-timeline>
       </v-container>
-    </template>
+    </template> -->
     <!-- TIMELINE END -->
   </v-container>
 </template>
@@ -239,7 +242,7 @@ body {
 }
 
 .v-timeline-item__divider {
-  align-items: start !important;
+  // align-items: start !important;
 }
 
 .module {
@@ -267,9 +270,10 @@ body {
 }
 </style>
 <script lang="ts">
-import { computed, reactive, ref, toRefs, defineComponent } from '@vue/composition-api';
+import { computed, reactive, ref, toRefs, defineComponent, PropType } from '@vue/composition-api';
 import '../styles/module.scss';
-// import { Collection } from 'mongodb';
+import { getModMongoDoc, getModAdk } from 'pcv4lib/src';
+import { MongoDoc } from './types';
 import * as Module from './components';
 
 export default defineComponent({
@@ -281,27 +285,78 @@ export default defineComponent({
     'module-presets': Module.Presets,
     'module-preview': Module.Default
   },
-  //   props: {
-  // programCollection: {
-  //   required: true,
-  //   type: Object as PropType<Collection>
-  // },
-  // programId: {
-  //   require: true,
-  //   type: String
-  // }
-  //   },
-  setup() {
-    //
-    // props.programCollection.findOne({
-    //   _id: props.programId
-    // });
+  props: {
+    value: {
+      required: true,
+      type: Object as PropType<MongoDoc>
+    },
+    userType: {
+      required: true,
+      type: String
+      // participant: '',
+      // organizer: '',
+      // stakeholder: ''
+    },
+    teamDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc | null>,
+      default: () => {}
+    },
+    studentDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc | null>,
+      default: () => {}
+    },
+    userDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc | null>,
+      default: () => {}
+    },
+    db: {
+      required: false,
+      type: Object as PropType<Db>,
+      default: () => {}
+    }
+  },
+  setup(props, ctx) {
     // ENTER ACTIVITY NAME BELOW
+    const defaultForumProps = {
+      maxQuestions: 2
+    };
+    if (props.value) {
+      getModAdk(props, ctx.emit, 'forum', defaultForumProps);
+    }
+
+    const defaultTeamData = {
+      questionsAsked: []
+    };
+    if (props.teamDoc)
+      getModAdk(props, ctx.emit, 'forum', defaultTeamData, 'teamDoc', 'inputTeamDoc');
+
+    const defaultStudentAdkData = {
+      bookmarkedQuestions: [],
+      likedQuestions: [],
+      dislikedQuestions: [],
+      flaggedQuestions: [],
+      likedComments: [],
+      flaggedComments: []
+    };
+
+    if (props.studentDoc)
+      getModAdk(props, ctx.emit, 'forum', defaultStudentAdkData, 'studentDoc', 'inputStudentDoc');
+
+    const programDoc = getModMongoDoc(props, ctx.emit);
+
     const moduleName = ref('Forum');
     const page = reactive({
-      subpages: ['Setup', 'Presets', 'Monitor'],
+      subpages: ['Setup', 'Presets'],
       currentPage: 'Setup'
     });
+    if (props.userType === 'organizer') {
+      page.currentPage = 'setup';
+    } else {
+      page.currentPage = 'preview';
+    }
     const getComponent = computed(() => {
       return `module-${page.currentPage.toLowerCase()}`;
     });
@@ -312,7 +367,7 @@ export default defineComponent({
         ['#ae90b0', '#f79961', '#000000']
       ],
       // ENTER ACTIVITY COLOR
-      selectedColor: '#f79961'
+      selectedColor: '#ea6764'
     });
     const getColor = computed(() => {
       return color.selectedColor.substring(0, 7);
@@ -350,6 +405,7 @@ export default defineComponent({
       timelineData.input = '';
     }
     return {
+      programDoc,
       ...toRefs(color),
       ...toRefs(page),
       config,

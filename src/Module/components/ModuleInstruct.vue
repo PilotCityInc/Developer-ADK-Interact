@@ -1,109 +1,145 @@
 <template>
-  <!--  TODO: make the inputs into actual components /modification -->
-  <v-container class="module-instruct">
-    <div class="module-instruct__container">
-      <div class="module-instruct__description">
-        <div class="module-instruct__description-label">
-          <span>Goal</span>
-        </div>
-        <div
-          :contenteditable="!readonly"
-          class="font-weight-black text-body-1"
-          @input="updateDesc($event)"
-        >
-          {{ description }}
-        </div>
-      </div>
-      <div class="module-instruct__instructions">
-        <div class="module-instruct__description-label">
-          <span>Instructions</span>
-        </div>
-        <div
-          v-for="(item, index) in instructions"
-          :key="item + index"
-          class="module-instruct__instructions-item"
-        >
-          <v-avatar
-            size="35"
-            class="module-instruct__instructions-av font-weight-black text-caption d-none d-sm-flex"
-          >
-            {{ index + 1 }}
-          </v-avatar>
-          <div
-            :contenteditable="!readonly"
-            class="module-instruct__instructions-text font-weight-black text-body-1"
-          >
-            {{ item }}
+  <ValidationObserver v-slot="{}" slim>
+    <!--  TODO: make the inputs into actual components -->
+    <v-container class="module-instruct">
+      <div class="module-instruct__container">
+        <div class="module-instruct__description">
+          <div class="module-instruct__description-label">
+            <span>Goal</span>
+            <v-dialog v-model="tutorialDialog" width="516">
+              <template #activator>
+                <v-tooltip right>
+                  <template #activator="{ on, attrs }">
+                    <v-btn v-bind="attrs" icon v-on="on"
+                      ><v-icon color="grey darken-2" @click="tutorialDialog = true"
+                        >mdi-youtube</v-icon
+                      ></v-btn
+                    >
+                  </template>
+                  <span>Watch video overview</span>
+                </v-tooltip>
+              </template>
+              <v-card dark class="login__dialog">
+                <div>
+                  <iframe
+                    width="100%"
+                    height="400"
+                    src="https://www.youtube.com/embed/J0hrCnKvQh0"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                  ></iframe>
+                </div>
+              </v-card>
+            </v-dialog>
           </div>
+
+          <v-textarea
+            v-model="goal"
+            rows="3"
+            outlined
+            class=""
+            rounded
+            hide-details
+            dense
+            auto-grow
+            disabled
+          ></v-textarea>
         </div>
-        <div
-          v-if="!readonly"
-          class="module-instruct__instructions-add font-weight-black text-body-1"
-        >
-          <v-icon class="module-instruct__instructions-add-icon"> mdi-plus </v-icon>
+        <div class="module-instruct__instructions">
+          <div class="module-instruct__description-label">
+            <span>Instructions</span>
+
+            <v-tooltip right>
+              <template #activator="{ on, attrs }">
+                <a href="https://discord.gg/JaWg85zE" target="_blank" style="text-decoration: none">
+                  <v-btn v-bind="attrs" icon v-on="on"
+                    ><v-icon color="grey darken-2">mdi-face-agent</v-icon></v-btn
+                  ></a
+                >
+              </template>
+              <span>Ask questions & get advice</span>
+            </v-tooltip>
+          </div>
+          <div
+            v-for="(i, index) in boilerInstructions"
+            :key="index"
+            class="module-instruct__instructions-item"
+          >
+            <v-avatar
+              size="35"
+              color="white"
+              class="module-instruct__instructions-av font-weight-bold"
+            >
+              {{ index + 1 }}
+            </v-avatar>
+
+            <validation-provider v-slot="{ errors }" slim rules="required">
+              <v-textarea
+                v-model="boilerInstructions[index]"
+                rows="1"
+                outlined
+                hide-details
+                dense
+                rounded
+                :error-messages="errors"
+                class=""
+                auto-grow
+                disabled
+              ></v-textarea>
+            </validation-provider>
+          </div>
+
+          <!-- <div>
+            <v-btn
+              class="module-instruct__instructions-add font-weight-black text-body-1"
+              depressed
+              color="white"
+              :disabled="invalid"
+              :ripple="false"
+              @click="populate()"
+            >
+              <v-icon class="module-instruct__instructions-add-icon"> mdi-plus </v-icon>
+            </v-btn>
+          </div> -->
         </div>
       </div>
-    </div>
-  </v-container>
+    </v-container>
+  </ValidationObserver>
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  reactive,
-  WritableComputedRef,
-  toRefs,
-  defineComponent
-} from '@vue/composition-api';
+import { ref, computed, defineComponent, PropType } from '@vue/composition-api';
 
 export default defineComponent({
   name: 'ModuleInstruct',
-  model: {
-    prop: 'value',
-    event: 'input'
-  },
-  props: {
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    value: {
-      type: Object,
-      default: () => {
-        return {
-          description: '',
-          instructions: ['', '', '']
-        };
-      }
-    }
-  },
-  apollo: {},
-  setup(props, { emit }) {
-    const description: WritableComputedRef<string> = computed({
-      get: () => props.value.description,
-      set: newVal => emit('input', newVal)
-    });
-    const instructions: WritableComputedRef<string[]> = computed({
-      get: () => props.value.instructions,
-      set: newVal => emit('input', instructions.value.concat(newVal))
-    });
-    const updateData = reactive({
-      updateDesc: (e: Event) => {
-        const target = e.target as HTMLElement;
-        description.value = target.innerText;
-      },
-      updateInstruction: (e: Event) => {
-        const target = e.target as HTMLElement;
-        instructions.value = [target.innerText];
-      }
-    });
-    return {
-      ...toRefs(updateData as any),
-      description,
-      instructions
-    };
+
+  setup() {
+    // const programDoc = computed({
+    //   get: () => props.value,
+    //   set: newVal => {
+    //     ctx.emit('input', newVal);
+    //   }
+    // });
+    const boilerInstructions = ref([
+      'Ask questions up to the limit',
+      'Review, answer or make comments to community questions',
+      'Upvote, downvote, bookmark & await answers to your questions'
+    ]);
+    const goal = ref([
+      'To ask & answer questions with your student peers in the program to collectively advance your projects'
+    ]);
+    // function populate() {
+    //   boilerInstructions.value.push('');
+    // }
+
+    return { boilerInstructions, tutorialDialog: false, goal };
   }
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.module-instruct__instructions-av {
+  margin-right: 3%;
+}
+</style>
