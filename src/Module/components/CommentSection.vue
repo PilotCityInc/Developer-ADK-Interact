@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel-content>
     <v-timeline dense>
-      <v-timeline-item fill-dot class="white--text mb-6" color="#f79961">
+      <v-timeline-item fill-dot class="white--text mb-6" color="#ea6764">
         <template v-slot:icon>
           <v-avatar size="34"
             ><img
