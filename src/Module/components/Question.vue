@@ -65,7 +65,12 @@
           </v-btn>
         </div>
       </v-expansion-panel-header>
-      <CommentSection :question="question" :student-adk-data="studentAdkData" v-on="$listeners" />
+      <CommentSection
+        :question="question"
+        :student-adk-data="studentAdkData"
+        :user-type="userType"
+        v-on="$listeners"
+      />
     </v-expansion-panel>
   </v-expansion-panels>
 </template>

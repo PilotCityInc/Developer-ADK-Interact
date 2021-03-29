@@ -62,11 +62,7 @@ export default defineComponent({
       collection() {
         return {
           find(query: any) {
-            return {
-              toArray() {
-                return new Promise((resolve, reject) => resolve(questions.value));
-              }
-            };
+            return new Promise((resolve, reject) => resolve(questions.value));
           },
           findOne({ _id }: any) {
             return new Promise((resolve, reject) =>
@@ -134,7 +130,8 @@ export default defineComponent({
             firstName: 'travis',
             lastName: 'scott'
           }
-        ]
+        ],
+        adks: []
       },
       update: () => {
         return new Promise((resolve, reject) => {
@@ -172,7 +169,7 @@ export default defineComponent({
       update: () => {},
       changeStream: {}
     });
-    const userTypeStub = 'organizer';
+    const userTypeStub = 'participant';
     if (userTypeStub === 'organizer') {
       studentDoc.value = null;
       teamDoc.value = null;
@@ -180,9 +177,9 @@ export default defineComponent({
     return {
       programDocStub,
       userTypeStub,
-      studentDoc: null,
+      studentDoc,
       userDoc,
-      teamDoc: null,
+      teamDoc,
       db
     };
   }

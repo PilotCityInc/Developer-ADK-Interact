@@ -93,12 +93,13 @@
         </div>
       </div>
       <div class="forum__question justify-center">
-        <div class="mt-12" v-if="timeline.length > 0 && studentDoc">
+        <div v-if="timeline.length > 0 && studentDoc" class="mt-12">
           <Question
             v-for="question in timeline"
             :key="question._id.toString()"
             :student-adk-data="studentAdkData"
             :question="question"
+            :user-type="userType"
             @likeQuestion="likeQuestion"
             @dislikeQuestion="dislikeQuestion"
             @bookmarkQuestion="bookmarkQuestion"
@@ -251,6 +252,10 @@ export default defineComponent({
     };
     fetchQuestions();
 
+    if (state.teamAdkData?.questionsAsked.length >= 1) {
+      state.studentAdkData!.isComplete = true;
+    }
+
     const scrollUp = () => {
       window.scrollTo(0, 300);
     };
@@ -282,15 +287,7 @@ export default defineComponent({
 
     const questionsRemaining = computed(() => {
       const teamQuestions = state.teamAdkData ? state.teamAdkData.questionsAsked : [];
-      const ret = adkData.value.maxQuestions - teamQuestions.length;
-      if (ret <= 0) {
-        // When the user has asked enough questions, we will unlock the next module.
-        adkData.value.update(() => ({
-          isComplete: true,
-          adkIndex
-        }));
-      }
-      return ret;
+      return adkData.value.maxQuestions - teamQuestions.length;
     });
 
     // Question and Comments Actions

@@ -38,6 +38,7 @@
           :student-adk-data="studentAdkData"
           :comment="comment"
           :question-id="question._id"
+          :user-type="userType"
           v-on="$listeners"
         />
       </v-slide-x-transition>
