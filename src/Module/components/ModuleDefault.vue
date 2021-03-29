@@ -92,8 +92,8 @@
           >
         </div>
       </div>
-      <div class="justify-center">
-        <div v-if="timeline.length > 0 && studentDoc">
+      <div class="forum__question justify-center">
+        <div class="mt-12" v-if="timeline.length > 0 && studentDoc">
           <Question
             v-for="question in timeline"
             :key="question._id.toString()"
@@ -108,7 +108,7 @@
             @flagComment="flagComment"
           />
         </div>
-        <div v-else class="module-default__none">No questions just yet</div>
+        <div v-else class="module-default__none mt-12">No questions just yet</div>
 
         <div v-if="timeline.length > 0" class="text-center mt-12">
           <v-pagination v-model="page" :length="numPages" circle @input="scrollUp"></v-pagination>
@@ -592,6 +592,7 @@ export default defineComponent({
     color: #ffffff;
     font-size: 18px;
     padding-top: 35px;
+    width: 100%;
   }
 
   &__collapse-divider {

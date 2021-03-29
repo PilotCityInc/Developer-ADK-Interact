@@ -1,5 +1,5 @@
 <template>
-  <v-timeline-item class="mb-3" color="#f79961" fill-dot small>
+  <v-timeline-item class="mb-3" color="#ea6764" fill-dot small>
     <template v-slot:icon>
       <v-avatar size="20"
         ><img
