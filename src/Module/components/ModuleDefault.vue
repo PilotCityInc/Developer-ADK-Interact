@@ -248,8 +248,6 @@ export default defineComponent({
       // ignore these warnings, the main repo returns an array instead of a Cursor
       questions.sort((a: QuestionType, b: QuestionType) => (a.likes > b.likes ? 1 : -1));
       state.questions = questions;
-      // ! can't figure this out
-      // .aggregate([{$search: {equals: {path: 'program_id', value: props.value!.data._id }}}, {$sort: {likes: -1}}])
     };
     fetchQuestions();
 
@@ -427,7 +425,10 @@ export default defineComponent({
         const { insertedId } = await props.db.collection('Question').insertOne(question);
         fetchQuestions();
         state.teamAdkData?.questionsAsked.push(insertedId);
-        state.teamDocument!.update();
+        state.teamDocument!.update(() => ({
+          isComplete: true,
+          adkIndex
+        }));
         state.questionInput = '';
       }
     };

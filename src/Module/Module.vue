@@ -273,6 +273,7 @@ body {
 import { computed, reactive, ref, toRefs, defineComponent, PropType } from '@vue/composition-api';
 import '../styles/module.scss';
 import { getModMongoDoc, getModAdk } from 'pcv4lib/src';
+import * as Realm from 'realm-web';
 import { MongoDoc } from './types';
 import * as Module from './components';
 
@@ -299,22 +300,22 @@ export default defineComponent({
     },
     teamDoc: {
       required: false,
-      type: Object as PropType<MongoDoc | null>,
+      type: Object as () => MongoDoc | null,
       default: () => {}
     },
     studentDoc: {
       required: false,
-      type: Object as PropType<MongoDoc | null>,
+      type: Object as () => MongoDoc | null,
       default: () => {}
     },
     userDoc: {
       required: false,
-      type: Object as PropType<MongoDoc | null>,
+      type: Object as () => MongoDoc | null,
       default: () => {}
     },
     db: {
       required: false,
-      type: Object as PropType<Db>,
+      type: Object,
       default: () => {}
     }
   },

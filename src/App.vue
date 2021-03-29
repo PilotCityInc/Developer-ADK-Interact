@@ -20,7 +20,7 @@ import { ObjectId } from 'bson';
 import Module from './Module/Module.vue';
 import { MongoDoc } from './Module/types';
 
-const dummyQuestions = new Array(42).fill().map((e, i) => {
+const dummyQuestions = new Array(42).fill(null).map((e, i) => {
   return {
     _id: new ObjectId(i),
     author: new ObjectId(2),
@@ -59,26 +59,26 @@ export default defineComponent({
   setup() {
     const questions = ref(dummyQuestions);
     const db: Db = ({
-      collection(name) {
+      collection() {
         return {
-          find(query) {
+          find(query: any) {
             return {
               toArray() {
                 return new Promise((resolve, reject) => resolve(questions.value));
               }
             };
           },
-          findOne({ _id }) {
+          findOne({ _id }: any) {
             return new Promise((resolve, reject) =>
-              resolve(questions.value.filter(obj => obj._id.equals(_id))[0])
+              resolve(questions.value.filter((obj: any) => obj._id.equals(_id))[0])
             );
           },
-          insertOne(doc) {
+          insertOne(doc: any) {
             const _id = new ObjectId(Math.floor(Math.random() * 100 + 42));
             questions.value.push({ _id, ...doc });
             return new Promise((resolve, reject) => resolve({ insertedId: _id }));
           },
-          updateOne({ _id }, query) {
+          updateOne({ _id }: any, query: any) {
             return new Promise((resolve, reject) => {
               const question = questions.value.filter(obj => obj._id.equals(_id))[0];
               // update
@@ -86,9 +86,9 @@ export default defineComponent({
               resolve(true);
             });
           },
-          deleteOne({ _id }) {
+          deleteOne({ _id }: any) {
             return new Promise((resolve, reject) => {
-              questions.value = questions.value.filter(obj => !obj._id.equals(_id));
+              questions.value = questions.value.filter((obj: any) => !obj._id.equals(_id));
               resolve(true);
             });
           }
@@ -163,15 +163,20 @@ export default defineComponent({
       },
       changeStream: {}
     });
-    const userDoc: Ref<MongoDoc> = ref({
+    const userDoc = ref({
       data: {
         firstName: 'me',
         lastName: 'test',
         _id: new ObjectId(2)
       },
+      update: () => {},
       changeStream: {}
     });
     const userTypeStub = 'organizer';
+    if (userTypeStub === 'organizer') {
+      studentDoc.value = null;
+      teamDoc.value = null;
+    }
     return {
       programDocStub,
       userTypeStub,
