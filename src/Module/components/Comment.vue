@@ -1,10 +1,7 @@
 <template>
   <v-timeline-item class="mb-3" color="#ea6764" fill-dot small>
     <template v-slot:icon>
-      <v-avatar size="20"
-        ><img
-          src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
-      /></v-avatar>
+      <v-avatar size="20" color="grey lighten-2"><v-img :src="comment.avatar" /></v-avatar>
     </template>
     <v-row justify="space-between">
       <v-col class="module-default__answer-text" cols="9" v-text="comment.text"></v-col>

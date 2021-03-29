@@ -98,6 +98,7 @@
             v-for="question in timeline"
             :key="question._id.toString()"
             :student-adk-data="studentAdkData"
+            :user-doc="userDoc"
             :question="question"
             :user-type="userType"
             @likeQuestion="likeQuestion"

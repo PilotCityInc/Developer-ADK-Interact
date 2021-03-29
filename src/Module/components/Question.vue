@@ -68,6 +68,7 @@
       <CommentSection
         :question="question"
         :student-adk-data="studentAdkData"
+        :user-doc="userDoc"
         :user-type="userType"
         v-on="$listeners"
       />
@@ -78,7 +79,7 @@
 <script lang="ts">
 import { defineComponent, ref, PropType } from '@vue/composition-api';
 import CommentSection from './CommentSection.vue';
-import { Question } from '../types';
+import { MongoDoc, Question } from '../types';
 import {
   questionIsBookmarked,
   questionIsDisliked,
@@ -104,6 +105,11 @@ export default defineComponent({
       // participant: '',
       // organizer: '',
       // stakeholder: ''
+    },
+    userDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc>,
+      default: () => {}
     }
   },
   setup(props) {

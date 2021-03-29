@@ -3,9 +3,8 @@
     <v-timeline dense>
       <v-timeline-item fill-dot class="white--text mb-6" color="#ea6764">
         <template v-slot:icon>
-          <v-avatar size="34"
-            ><img
-              src="https://media-exp1.licdn.com/dms/image/C5603AQEq9BL9NuOBAQ/profile-displayphoto-shrink_400_400/0/1603066536315?e=1616025600&v=beta&t=e0AFzZqk1mQEHUMcwpSSb1_egDOI5sAJ-wUK0VY3hmc"
+          <v-avatar size="34" color="grey lighten-2"
+            ><v-img :src="userDoc.data.profile ? userDoc.data.profile.small : ''"
           /></v-avatar>
         </template>
         <v-text-field
@@ -52,7 +51,7 @@
 <script lang="ts">
 import { defineComponent, ref, PropType, computed } from '@vue/composition-api';
 import { ObjectId } from 'bson';
-import { Question } from '../types';
+import { MongoDoc, Question } from '../types';
 import Comment from './Comment.vue';
 
 export default defineComponent({
@@ -73,6 +72,11 @@ export default defineComponent({
       // participant: '',
       // organizer: '',
       // stakeholder: ''
+    },
+    userDoc: {
+      required: false,
+      type: Object as PropType<MongoDoc>,
+      default: () => {}
     }
   },
   setup(props, ctx) {
@@ -97,6 +101,7 @@ export default defineComponent({
               .map(v => v.charAt(0))
               .join('')}`;
           }),
+          avatar: props.userDoc.data.profile ? props.userDoc.data.profile.small : '',
           likes: 0,
           flags: 0
         });
