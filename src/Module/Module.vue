@@ -340,7 +340,8 @@ export default defineComponent({
       dislikedQuestions: [],
       flaggedQuestions: [],
       likedComments: [],
-      flaggedComments: []
+      flaggedComments: [],
+      isComplete: false
     };
 
     if (props.studentDoc)
