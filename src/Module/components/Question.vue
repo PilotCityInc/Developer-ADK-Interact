@@ -47,7 +47,7 @@
           <v-btn class="ml-3 mr-2" small icon @click="$emit('flagQuestion', question._id)"
             ><v-icon
               small
-              :color="questionIsFlagged(studentAdkData, question) ? 'red' : 'grey lighten-2'"
+              :color="questionIsFlagged(studentAdkData, question) ? 'orange' : 'grey lighten-2'"
               >mdi-flag</v-icon
             >
           </v-btn>
@@ -59,7 +59,7 @@
             @click="$emit('bookmarkQuestion', question._id)"
             ><v-icon
               small
-              :color="questionIsBookmarked(studentAdkData, question) ? 'black' : 'grey lighten-2'"
+              :color="questionIsBookmarked(studentAdkData, question) ? 'yellow' : 'grey lighten-2'"
               >mdi-bookmark</v-icon
             >
           </v-btn>

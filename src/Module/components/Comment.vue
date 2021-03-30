@@ -3,8 +3,8 @@
     <template v-slot:icon>
       <v-avatar size="20" color="grey lighten-2"><v-img :src="comment.avatar" /></v-avatar>
     </template>
-    <v-row justify="space-between">
-      <v-col class="module-default__answer-text" cols="9" v-text="comment.text"></v-col>
+    <v-row justify="space-between" class="align-center">
+      <v-col class="module-default__answer-text align-center" cols="9" v-text="comment.text"></v-col>
       <!-- <v-col class="text-right" cols="3" v-text="event.time"></v-col> -->
       <v-col class="text-right" cols="3">
         <!-- POSTER, STUDENT PARTICIPANT OR ORGANIZER CAN DELETE POSTS -->
@@ -24,7 +24,7 @@
             :disabled="userType === 'stakeholder'"
             class="module__trash"
             small
-            :color="commentIsLiked(studentAdkData, comment) ? 'red' : 'grey'"
+            :color="commentIsLiked(studentAdkData, comment) ? 'pink' : 'grey'"
             >mdi-heart</v-icon
           ></v-btn
         >
@@ -36,7 +36,7 @@
           @click="$emit('flagComment', questionId, comment._id)"
           ><v-icon
             small
-            :color="commentIsFlagged(studentAdkData, comment) ? 'red' : 'grey lighten-2'"
+            :color="commentIsFlagged(studentAdkData, comment) ? 'orange' : 'grey lighten-2'"
             class="module__trash"
             >mdi-flag</v-icon
           ></v-btn
