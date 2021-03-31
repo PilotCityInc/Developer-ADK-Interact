@@ -52,7 +52,7 @@
             class="module-default__text-field"
             outlined
             :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
-            :placeholder="`Your team has ${questionsRemaining} questions remaining`"
+            :placeholder="`Your team has ${questionsRemaining} questions remaining to ask`"
           >
           </v-text-field>
         </div>
