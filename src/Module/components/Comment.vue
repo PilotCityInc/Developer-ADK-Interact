@@ -3,10 +3,10 @@
     <template v-slot:icon>
       <v-avatar size="20" color="grey lighten-2"><v-img :src="comment.avatar" /></v-avatar>
     </template>
-    <v-row justify="space-between" class="align-center">
-      <v-col class="module-default__answer-text align-center" cols="9" v-text="comment.text"></v-col>
+    <v-row justify="space-between" class="d-flex align-center">
+      <v-col class="module-default__answer-text d-flex align-center" cols="9" v-text="comment.text"></v-col>
       <!-- <v-col class="text-right" cols="3" v-text="event.time"></v-col> -->
-      <v-col class="text-right" cols="3">
+      <v-col class="text-right d-flex align-center" cols="3">
         <!-- POSTER, STUDENT PARTICIPANT OR ORGANIZER CAN DELETE POSTS -->
         <!-- <v-btn small class="module__trash" icon
 													><v-icon small color="grey" class="module__trash"
