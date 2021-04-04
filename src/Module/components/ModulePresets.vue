@@ -2,7 +2,7 @@
   <v-container class="module-outcomes">
     <div class="module-outcomes__container">
       <!-- <v-divider class="presets__divider"></v-divider> -->
-      <div class="presets__section-title">General</div>
+      <!-- <div class="presets__section-title">General</div> -->
       <v-select
         v-model="adkData.maxQuestions"
         :items="maxQuestionsItems"
