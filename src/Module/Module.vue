@@ -352,10 +352,10 @@ export default defineComponent({
     const moduleName = ref('Forum');
     const page = reactive({
       subpages: ['Setup', 'Presets'],
-      currentPage: 'Presets'
+      currentPage: 'setup'
     });
     if (props.userType === 'organizer') {
-      page.currentPage = 'setup';
+      page.currentPage = 'presets';
     } else {
       page.currentPage = 'preview';
     }
