@@ -61,8 +61,7 @@
             :disabled="userType === 'stakeholder'"
             color="#ea6764"
             rounded
-            dark
-            class="module-default__log-btn"
+            class="module-default__log-btn white--text"
             depressed
             x-large
             @click="postQuestion"
