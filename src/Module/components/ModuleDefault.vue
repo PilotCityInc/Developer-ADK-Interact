@@ -209,6 +209,7 @@ export default defineComponent({
         : null,
       studentAdkData: null as null | Record<string, any>,
       teamAdkData: null as null | Record<string, any>,
+      teamAdkIndex: -1,
       showInstructions: true,
       setupInstructions: {
         description: '',
@@ -216,7 +217,7 @@ export default defineComponent({
       }
     });
 
-    const { adkData, adkIndex } = getModAdk(props, ctx.emit, 'forum');
+    const { adkData } = getModAdk(props, ctx.emit, 'forum');
 
     if (props.studentDoc) {
       const { adkData: studentAdkData } = getModAdk(
@@ -231,7 +232,7 @@ export default defineComponent({
     }
 
     if (props.teamDoc) {
-      const { adkData: teamAdkData } = getModAdk(
+      const { adkData: teamAdkData, adkIndex } = getModAdk(
         props,
         ctx.emit,
         'forum',
@@ -240,6 +241,7 @@ export default defineComponent({
         'inputTeamDoc'
       );
       state.teamAdkData = teamAdkData.value;
+      state.teamAdkIndex = adkIndex;
     }
 
     const fetchQuestions = async () => {
@@ -251,10 +253,6 @@ export default defineComponent({
       state.questions = questions;
     };
     fetchQuestions();
-
-    if (state.teamAdkData?.questionsAsked.length >= 1) {
-      state.studentAdkData!.isComplete = true;
-    }
 
     const scrollUp = () => {
       window.scrollTo(0, 300);
@@ -424,7 +422,7 @@ export default defineComponent({
         state.teamAdkData?.questionsAsked.push(insertedId);
         state.teamDocument!.update(() => ({
           isComplete: true,
-          adkIndex
+          adkIndex: state.teamAdkIndex
         }));
         state.questionInput = '';
       }
