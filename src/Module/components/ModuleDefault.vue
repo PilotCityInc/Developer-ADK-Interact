@@ -42,7 +42,7 @@
       buffer-value="100"
       stream
     />
-    <div class="module-default__container mt-12">
+    <div class="module-default__container mt-12 d-flex flex-column">
       <!-- ENTER CONTENT HERE -->
       <div class="forum__question mb-8">
         <v-text-field
