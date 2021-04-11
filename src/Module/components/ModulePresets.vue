@@ -14,9 +14,13 @@
       <div class="text-center">
         <v-btn class="mt-8" rounded x-large outlined depressed :loading="loading" @click="process()">Save</v-btn>
       </div>
-      <v-alert v-if="success || error" :type="success ? 'success' : 'error'" class="mt-2">{{
-        message
-      }}</v-alert>
+      <v-alert
+        v-if="success || error"
+        dense
+        class="mt-3 white--text presets__alert"
+        :color="success ? 'green' : 'red'"
+        >{{ message }}</v-alert
+      >
       <!-- <v-divider class="presets__divider"></v-divider>
       <div class="presets__section-title">Instructions</div>
       <Instruct v-model="setupInstructions" />
@@ -142,7 +146,7 @@ export default {
     return {
       adkData,
       ...toRefs(presets),
-      ...loading(programDoc.value.update, 'Saved Successfully', 'Could not save at this time'),
+      ...loading(programDoc.value.update, 'Success', 'Try again later'),
       setupInstructions,
       maxQuestionsItems
     };
