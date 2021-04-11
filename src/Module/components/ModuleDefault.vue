@@ -42,9 +42,9 @@
       buffer-value="100"
       stream
     />
-    <div class="forum__question justify-center align-center d-flex flex-column pa-5 mt-12">
+    <div class="module-default__container mt-12">
       <!-- ENTER CONTENT HERE -->
-      <div class="d-flex flex-row justify-center mb-8">
+      <div class="forum__question mb-8">
         <v-text-field
           v-model="questionInput"
           rounded
@@ -551,7 +551,10 @@ export default defineComponent({
 //   max-width: 100% !important;
 // }
 .forum__question {
-  width: 100%;
+    display: flex;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 .module-default {
   &__answer-text {
