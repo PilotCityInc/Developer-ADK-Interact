@@ -104,7 +104,7 @@
           @flagComment="flagComment"
         />
       </div>
-      <div v-else class="module-default__none mt-12">No questions just yet</div>
+      <div v-else class="module-default__none ml-auto mr-auto mt-12">No questions just yet</div>
       <div v-if="timeline.length > 0" class="text-center mt-12">
         <v-pagination v-model="page" :length="numPages" circle @input="scrollUp"></v-pagination>
       </div>
