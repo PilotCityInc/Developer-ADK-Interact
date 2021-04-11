@@ -87,7 +87,7 @@
           >
         </div>
       </div>
-      <div class="forum__question justify-center mt-12" v-if="timeline.length > 0 && studentDoc">
+      <div class="forum__question d-flex flex-column justify-center mt-12" v-if="timeline.length > 0 && studentDoc">
         <Question
           v-for="question in timeline"
           :key="question._id.toString()"
