@@ -87,26 +87,24 @@
           >
         </div>
       </div>
-      <div class="forum__question justify-center">
-        <div v-if="timeline.length > 0 && studentDoc" class="mt-12">
-          <Question
-            v-for="question in timeline"
-            :key="question._id.toString()"
-            :student-adk-data="studentAdkData"
-            :user-doc="userDoc"
-            :question="question"
-            :user-type="userType"
-            @likeQuestion="likeQuestion"
-            @dislikeQuestion="dislikeQuestion"
-            @bookmarkQuestion="bookmarkQuestion"
-            @flagQuestion="flagQuestion"
-            @postComment="postComment"
-            @likeComment="likeComment"
-            @flagComment="flagComment"
-          />
-        </div>
-        <div v-else class="module-default__none mt-12">No questions just yet</div>
+      <div class="forum__question justify-center mt-12" v-if="timeline.length > 0 && studentDoc">
+        <Question
+          v-for="question in timeline"
+          :key="question._id.toString()"
+          :student-adk-data="studentAdkData"
+          :user-doc="userDoc"
+          :question="question"
+          :user-type="userType"
+          @likeQuestion="likeQuestion"
+          @dislikeQuestion="dislikeQuestion"
+          @bookmarkQuestion="bookmarkQuestion"
+          @flagQuestion="flagQuestion"
+          @postComment="postComment"
+          @likeComment="likeComment"
+          @flagComment="flagComment"
+        />
       </div>
+      <div v-else class="module-default__none mt-12">No questions just yet</div>
       <div v-if="timeline.length > 0" class="text-center mt-12">
         <v-pagination v-model="page" :length="numPages" circle @input="scrollUp"></v-pagination>
       </div>
