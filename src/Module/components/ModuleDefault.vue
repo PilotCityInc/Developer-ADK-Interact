@@ -45,29 +45,25 @@
     <div class="forum__question justify-center align-center d-flex flex-column pa-5 mt-12">
       <!-- ENTER CONTENT HERE -->
       <div class="d-flex flex-row justify-center mb-8">
-        <div>
-          <v-text-field
-            v-model="questionInput"
-            rounded
-            class="module-default__text-field"
-            outlined
-            :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
-            :placeholder="`Your team has ${questionsRemaining} questions remaining to ask`"
-          >
-          </v-text-field>
-        </div>
-        <div>
-          <v-btn
-            :disabled="userType === 'stakeholder'"
-            color="#ea6764"
-            rounded
-            class="module-default__log-btn white--text"
-            depressed
-            x-large
-            @click="postQuestion"
-            ><v-icon left>mdi-comment-text-multiple-outline</v-icon>Ask Question</v-btn
-          >
-        </div>
+        <v-text-field
+          v-model="questionInput"
+          rounded
+          class="module-default__text-field"
+          outlined
+          :disabled="questionsRemaining <= 0 || userType === 'stakeholder'"
+          :placeholder="`Your team has ${questionsRemaining} questions remaining to ask`"
+        >
+        </v-text-field>
+        <v-btn
+          :disabled="userType === 'stakeholder'"
+          color="#ea6764"
+          rounded
+          class="module-default__log-btn white--text"
+          depressed
+          x-large
+          @click="postQuestion"
+          ><v-icon left>mdi-comment-text-multiple-outline</v-icon>Ask Question</v-btn
+        >
       </div>
       <div class="d-flex flex-row justify-center">
         <div>
