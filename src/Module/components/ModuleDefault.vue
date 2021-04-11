@@ -42,7 +42,7 @@
       buffer-value="100"
       stream
     />
-    <div class="module-default__container mt-12 d-flex flex-column">
+    <div class="module-default__container mt-12">
       <!-- ENTER CONTENT HERE -->
       <div class="forum__question mb-8">
         <v-text-field
@@ -106,10 +106,9 @@
           />
         </div>
         <div v-else class="module-default__none mt-12">No questions just yet</div>
-
-        <div v-if="timeline.length > 0" class="text-center mt-12">
-          <v-pagination v-model="page" :length="numPages" circle @input="scrollUp"></v-pagination>
-        </div>
+      </div>
+      <div v-if="timeline.length > 0" class="text-center mt-12">
+        <v-pagination v-model="page" :length="numPages" circle @input="scrollUp"></v-pagination>
       </div>
       <!-- DESIGN YOUR ACTIVITY HERE / COMMENT OUT WHEN YOU'VE STARTED DESIGNING -->
       <!-- <div class="module-default__none">Design your activity here</div> -->
