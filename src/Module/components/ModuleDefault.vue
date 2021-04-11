@@ -65,7 +65,7 @@
             depressed
             x-large
             @click="postQuestion"
-            >Ask Question</v-btn
+            ><v-icon left>mdi-comment-text-multiple-outline</v-icon>Ask Question</v-btn
           >
         </div>
       </div>
