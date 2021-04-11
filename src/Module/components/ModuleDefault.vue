@@ -584,7 +584,7 @@ export default defineComponent({
     color: #ffffff;
     font-size: 18px;
     padding-top: 35px;
-    width: 100%;
+    width: 90%;
   }
 
   &__collapse-divider {
